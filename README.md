@@ -1,6 +1,32 @@
 # Gopher loyalty project
 
-#Docs
+# Docs
+
+Схема модулей проекта
+
+```mermaid
+flowchart TD
+    GophermartBuyer --> JWTAuth
+    JWTAuth --> API
+
+    subgraph GopherLoyalty[Группа GopherLoyalty]
+        API[API]
+        Worker[Worker]
+        Postgres[Postgres]
+
+        API --> Postgres
+        Worker --> Postgres
+    end
+
+    subgraph External[Внешняя система]
+        AccrualAPI[AccrualAPI]
+    end
+
+    Worker -- Периодический опрос --> AccrualAPI
+
+    GophermartBuyer[Gophermart Buyer]
+    JWTAuth[JWT Auth]
+```
 
 Схема БД и сущностей DDD (1 к 1)
 
@@ -14,7 +40,7 @@ erDiagram
 
     LoyaltyAccount {
         uuid LoyaltyAccountID
-        int UserID
+        int UserID (unique)
         int balance
         int withdrawTotal
     }
@@ -37,7 +63,7 @@ erDiagram
 
     BonusCalculation {
         uuid BonusCalculationID
-        uuid OrderID
+        uuid OrderID (unique)
         enum LoyaltyStatus
         int Accrual
     }
