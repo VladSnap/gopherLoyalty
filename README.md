@@ -49,7 +49,7 @@ erDiagram
 
     LoyaltyAccount {
         uuid LoyaltyAccountID
-        int UserID (unique)
+        int UserID "unique"
         int balance
         int withdrawTotal
     }
@@ -72,7 +72,7 @@ erDiagram
 
     BonusCalculation {
         uuid BonusCalculationID
-        uuid OrderID (unique)
+        uuid OrderID "unique"
         enum LoyaltyStatus
         int Accrual
     }
