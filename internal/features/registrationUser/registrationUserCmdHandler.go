@@ -18,27 +18,32 @@ func NewRegistrationUserCmdHandler(repo domain.UserRepository,
 	return &RegistrationUserCmdHandlerImpl{repo: repo, passService: passService}
 }
 
-func (s *RegistrationUserCmdHandlerImpl) Execute(ctx context.Context, login string, password string) error {
+func (s *RegistrationUserCmdHandlerImpl) Execute(ctx context.Context, login string, password string) (*domain.User, error) {
 	// Проверяем, что пользователь с таким логином не существует
 	exists, err := s.repo.ExistsByLogin(ctx, login)
 	if err != nil {
-		return fmt.Errorf("failed check ExistsByLogin: %w", err)
+		return nil, fmt.Errorf("failed check ExistsByLogin: %w", err)
 	}
 	if exists {
-		return domain.ErrLoginAlreadyUsed
+		return nil, domain.ErrLoginAlreadyUsed
 	}
 
 	hashedPassword, err := s.passService.HashPassword(password)
 	if err != nil {
-		return fmt.Errorf("failed HashPassword: %w", err)
+		return nil, fmt.Errorf("failed HashPassword: %w", err)
 	}
 
 	// Создаем нового пользователя
 	user, err := domain.NewUser(domain.GenerateUniqueID(), login, hashedPassword)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("failed create new user: %w", err)
 	}
 
 	// Сохраняем пользователя в репозитории
-	return s.repo.Create(ctx, user)
+	err = s.repo.Create(ctx, user)
+	if err != nil {
+		return nil, fmt.Errorf("failed save new user in DB: %w", err)
+	}
+
+	return user, nil
 }

@@ -31,7 +31,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	jwtService := services.NewJWTTokenService()
 
 	regCmd := registrationUser.NewRegistrationUserCmdHandler(userRepo, passService)
-	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd)
+	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd, jwtService)
 
 	loginUseCase := loginUser.NewLoginUserUseCase()
 

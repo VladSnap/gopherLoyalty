@@ -13,7 +13,7 @@ import (
 )
 
 type RegistrationUserUseCase interface {
-	Execute(ctx context.Context, input *registrationUser.RegisterRequest, output *api.EmptyBody) error
+	Execute(ctx context.Context, input *registrationUser.RegisterUserRequest, output *registrationUser.RegisterUserResponse) error
 }
 
 type LoginUserUseCase interface {
