@@ -33,7 +33,8 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	regCmd := registrationUser.NewRegistrationUserCmdHandler(userRepo, passService)
 	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd, jwtService)
 
-	loginUseCase := loginUser.NewLoginUserUseCase()
+	loginCmd := loginUser.NewRegistrationUserCmdHandler(userRepo, passService)
+	loginUseCase := loginUser.NewLoginUserUseCase(loginCmd, jwtService)
 
 	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase()
 

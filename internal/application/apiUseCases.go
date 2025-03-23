@@ -17,7 +17,7 @@ type RegistrationUserUseCase interface {
 }
 
 type LoginUserUseCase interface {
-	Execute(ctx context.Context, input *loginUser.LoginUserRequest, output *api.EmptyBody) error
+	Execute(ctx context.Context, input *loginUser.LoginUserRequest, output *loginUser.LoginUserResponse) error
 }
 
 type UploadOrderUseCase interface {

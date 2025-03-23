@@ -10,6 +10,7 @@ var (
 	ErrInvalidLogin     = errors.New("User: login is required")
 	ErrInvalidPassword  = errors.New("User: password is required")
 	ErrLoginAlreadyUsed = errors.New("User: login is already used")
+	ErrLoginOrPassword = errors.New("User: login or password invalid")
 )
 
 type User struct {

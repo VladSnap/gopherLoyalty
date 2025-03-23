@@ -41,10 +41,10 @@ func (r *UserImplRepository) FindByID(ctx context.Context, id string) (*domain.U
 	return dbUser.ToDomain()
 }
 
-func (r *UserImplRepository) FindByLoginAndPassword(ctx context.Context, login, password string) (*domain.User, error) {
-	query := `SELECT * FROM users WHERE login = $1 AND password = $2`
+func (r *UserImplRepository) FindByLogin(ctx context.Context, login string) (*domain.User, error) {
+	query := `SELECT * FROM users WHERE login = $1`
 	var dbUser dbModels.User
-	err := r.db.GetContext(ctx, &dbUser, query, login, password)
+	err := r.db.GetContext(ctx, &dbUser, query, login)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.Wrapf(ErrNotFound, "user with login %s not found", login)
