@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 
@@ -10,15 +9,16 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
 type DatabaseLoyalty struct {
-	*sql.DB
+	*sqlx.DB
 	Dsn string
 }
 
 func NewDatabaseLoyalty(dsn string) (*DatabaseLoyalty, error) {
-	db, err := sql.Open("pgx", dsn)
+	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed open database: %w", err)
 	}
@@ -38,7 +38,7 @@ func (ds *DatabaseLoyalty) Close() error {
 }
 
 func (ds *DatabaseLoyalty) InitDatabase() error {
-	driver, err := postgres.WithInstance(ds.DB, &postgres.Config{})
+	driver, err := postgres.WithInstance(ds.DB.DB, &postgres.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to initialize postgres driver: %w", err)
 	}
