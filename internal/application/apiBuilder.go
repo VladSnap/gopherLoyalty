@@ -1,6 +1,8 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/VladSnap/gopherLoyalty/internal/application/config"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getBalance"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getOrders"
@@ -9,10 +11,21 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/features/registrationUser"
 	"github.com/VladSnap/gopherLoyalty/internal/features/uploadOrder"
 	"github.com/VladSnap/gopherLoyalty/internal/features/withdrawBalance"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/repositories"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/services"
 )
 
 func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager) (ApiServer, error) {
+	database, err := repositories.NewDatabaseLoyalty(config.DatabaseURI)
+	if err != nil {
+		return nil, fmt.Errorf("failed create DatabaseShortener: %w", err)
+	}
+	resMng.Register(database.Close)
+	err = database.InitDatabase()
+	if err != nil {
+		return nil, fmt.Errorf("failed init Database: %w", err)
+	}
+
 	registerUseCase := registrationUser.NewRegistrationUserUseCase()
 	loginUseCase := loginUser.NewLoginUserUseCase()
 	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase()
