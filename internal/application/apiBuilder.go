@@ -26,12 +26,22 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 		return nil, fmt.Errorf("failed init Database: %w", err)
 	}
 
-	registerUseCase := registrationUser.NewRegistrationUserUseCase()
+	userRepo := repositories.NewUserImplRepository(database)
+	passService := services.NewPasswordServiceImpl()
+
+	regCmd := registrationUser.NewRegistrationUserCmdHandler(userRepo, passService)
+	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd)
+
 	loginUseCase := loginUser.NewLoginUserUseCase()
+
 	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase()
+
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase()
+
 	getBalanceUseCase := getBalance.NewGetBalanceUseCase()
+
 	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase()
+
 	getWithdrawalsUseCase := getWithdrawals.NewGetWithdrawalsUseCase()
 
 	server := NewApiServer(config,

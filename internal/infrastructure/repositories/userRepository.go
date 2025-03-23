@@ -53,4 +53,12 @@ func (r *UserImplRepository) FindByLoginAndPassword(ctx context.Context, login, 
 	}
 	return dbUser.ToDomain()
 }
+
+func (r *UserImplRepository) ExistsByLogin(ctx context.Context, login string) (bool, error) {
+	var count int
+	err := r.db.GetContext(ctx, &count, "SELECT COUNT(*) FROM users WHERE login = $1", login)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
