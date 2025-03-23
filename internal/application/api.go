@@ -14,10 +14,12 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	oapi "github.com/swaggest/openapi-go"
 	"github.com/swaggest/openapi-go/openapi31"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/web"
-	swgui "github.com/swaggest/swgui/v5emb"
+	"github.com/swaggest/swgui"
+	swguiv5 "github.com/swaggest/swgui/v5emb"
 	"github.com/swaggest/usecase"
 )
 
@@ -57,8 +59,8 @@ func NewApiServer(config *config.AppConfig,
 }
 
 func (server *SwaggestApiServer) Start() error {
-	// Service initializes router with required middlewares.
-	service := web.NewService(openapi31.NewReflector())
+	reflector := openapi31.NewReflector()
+	service := web.NewService(reflector)
 
 	// It allows OpenAPI configuration.
 	service.OpenAPISchema().SetTitle("GopherLoyalty API")
@@ -91,7 +93,14 @@ func (server *SwaggestApiServer) Start() error {
 		}
 	}()
 
-	service.Docs("/docs", swgui.New)
+	println(reflector.Spec.Components.Parameters)
+
+	swaggeConfig := swgui.Config{
+		SettingsUI: map[string]string{
+			"withCredentials": "true",
+		},
+	}
+	service.Docs("/docs", swguiv5.NewWithConfig(swaggeConfig))
 
 	// Запускаем прослушивание запросов.
 	err := serv.ListenAndServe()
@@ -138,14 +147,16 @@ func (server *SwaggestApiServer) registerRoutes(service *web.Service) error {
 	getWithdrawalsInter.SetName("getWithdrawalsUseCase")
 	getWithdrawalsInter.SetTags("Required Auth")
 
+	apiDocAuthDoc := nethttp.APIKeySecurityMiddleware(service.OpenAPICollector, "UserAuthToken",
+		"Authorization", oapi.InHeader, "Authorization token.")
+
 	service.Post("/api/user/register", registerInter, nethttp.SuccessStatus(http.StatusOK))
 	service.Post("/api/user/login", loginInter, nethttp.SuccessStatus(http.StatusOK))
 
 	// Регистрация защищенных аутентификацией и авторизацией маршрутов
-
 	service.Route("/api/user", func(r chi.Router) {
 		r.Group(func(rg chi.Router) {
-			//r.Use(authMiddleware)
+			rg.Use(middlewares.AuthMiddleware, apiDocAuthDoc)
 			rg.Method(http.MethodPost, "/orders", nethttp.NewHandler(uploadOrderInter, nethttp.SuccessStatus(http.StatusOK)))
 			rg.Method(http.MethodGet, "/orders", nethttp.NewHandler(getOrdersInter))
 			rg.Method(http.MethodGet, "/balance", nethttp.NewHandler(getBalanceInter))
