@@ -6,9 +6,9 @@ import (
 
 // UserAccountRepository определяет методы для работы с таблицей user_accounts.
 type UserAccountRepository interface {
-	Create(ctx context.Context, userAccount UserAccount) (string, error)
-	FindByID(ctx context.Context, id string) (*UserAccount, error)
-	FindByLoginAndPassword(ctx context.Context, login, password string) (*UserAccount, error)
+	Create(ctx context.Context, user User) (string, error)
+	FindByID(ctx context.Context, id string) (*User, error)
+	FindByLoginAndPassword(ctx context.Context, login, password string) (*User, error)
 }
 
 // OrderRepository определяет методы для работы с таблицей orders.

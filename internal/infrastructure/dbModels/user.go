@@ -2,6 +2,7 @@ package dbModels
 
 // User представляет таблицу пользователей.
 type User struct {
-	ID            string `db:"id"`              // uuid
-	UserAccountID string `db:"user_account_id"` // -> userAccount.ID (1 к 1)
+	ID       string `db:"id"`       // uuid
+	Login    string `db:"login"`    // string
+	Password string `db:"password"` // string
 }

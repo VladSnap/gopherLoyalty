@@ -1,13 +1,7 @@
-CREATE TABLE user_accounts (
-    id UUID PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE,
-    login TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-);
-
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    user_account_id UUID NOT NULL UNIQUE REFERENCES user_accounts(id) ON DELETE CASCADE
+    login TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
 );
 
 CREATE TABLE orders (
