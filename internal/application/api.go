@@ -93,8 +93,6 @@ func (server *SwaggestApiServer) Start() error {
 		}
 	}()
 
-	println(reflector.Spec.Components.Parameters)
-
 	swaggeConfig := swgui.Config{
 		SettingsUI: map[string]string{
 			"withCredentials": "true",
