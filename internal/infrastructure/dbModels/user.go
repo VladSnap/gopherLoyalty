@@ -20,7 +20,7 @@ func (dbu *User) ToDomain() (*domain.User, error) {
 		return nil, fmt.Errorf("failed ParseUniqueID: %w", err)
 	}
 
-	return domain.NewUser(id, dbu.Login, dbu.Password)
+	return domain.CreateUserFromDB(id, dbu.Login, dbu.Password), nil
 }
 
 // Преобразует доменную модель User в DBUser.

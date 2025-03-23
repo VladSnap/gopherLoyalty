@@ -10,7 +10,7 @@ var (
 	ErrInvalidLogin     = errors.New("User: login is required")
 	ErrInvalidPassword  = errors.New("User: password is required")
 	ErrLoginAlreadyUsed = errors.New("User: login is already used")
-	ErrLoginOrPassword = errors.New("User: login or password invalid")
+	ErrLoginOrPassword  = errors.New("User: login or password invalid")
 )
 
 type User struct {
@@ -20,7 +20,7 @@ type User struct {
 }
 
 // NewUser создает нового пользователя, если данные корректны.
-func NewUser(id uuid.UUID, login string, password string) (*User, error) {
+func NewUser(login string, password string) (*User, error) {
 	if login == "" {
 		return nil, ErrInvalidLogin
 	}
@@ -28,10 +28,19 @@ func NewUser(id uuid.UUID, login string, password string) (*User, error) {
 		return nil, ErrInvalidPassword
 	}
 	return &User{
-		id:       id,
+		id:       GenerateUniqueID(),
 		login:    login,
 		password: password,
 	}, nil
+}
+
+// CreateUserFromDB создает пользователя из БД, игнорирует валидацию.
+func CreateUserFromDB(id uuid.UUID, login string, password string) *User {
+	return &User{
+		id:       id,
+		login:    login,
+		password: password,
+	}
 }
 
 // GetID возвращает ID пользователя.
