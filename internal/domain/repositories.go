@@ -4,11 +4,11 @@ import (
 	"context"
 )
 
-// UserAccountRepository определяет методы для работы с таблицей user_accounts.
-type UserAccountRepository interface {
+// UserRepository определяет методы для работы с таблицей user.
+type UserRepository interface {
 	Create(ctx context.Context, user User) (string, error)
 	FindByID(ctx context.Context, id string) (*User, error)
-	FindByLoginAndPassword(ctx context.Context, login, password string) (*User, error)
+	FindByLoginAndPassword(ctx context.Context, login string, password string) (*User, error)
 }
 
 // OrderRepository определяет методы для работы с таблицей orders.
