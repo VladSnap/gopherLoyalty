@@ -12,6 +12,7 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/application/config"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api/middlewares"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/services"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	oapi "github.com/swaggest/openapi-go"
@@ -29,6 +30,7 @@ type ApiServer interface {
 
 type SwaggestApiServer struct {
 	config                *config.AppConfig
+	jwtService            services.JWTTokenService
 	registerUseCase       RegistrationUserUseCase
 	loginUseCase          LoginUserUseCase
 	getBalanceUseCase     GetBalanceUseCase
@@ -39,6 +41,7 @@ type SwaggestApiServer struct {
 }
 
 func NewApiServer(config *config.AppConfig,
+	jwtService services.JWTTokenService,
 	registerUseCase RegistrationUserUseCase,
 	loginUseCase LoginUserUseCase,
 	uploadOrderUseCase UploadOrderUseCase,
@@ -48,6 +51,7 @@ func NewApiServer(config *config.AppConfig,
 	getWithdrawalsUseCase GetWithdrawalsUseCase) *SwaggestApiServer {
 	server := new(SwaggestApiServer)
 	server.config = config
+	server.jwtService = jwtService
 	server.registerUseCase = registerUseCase
 	server.loginUseCase = loginUseCase
 	server.uploadOrderUseCase = uploadOrderUseCase
@@ -154,7 +158,7 @@ func (server *SwaggestApiServer) registerRoutes(service *web.Service) error {
 	// Регистрация защищенных аутентификацией и авторизацией маршрутов
 	service.Route("/api/user", func(r chi.Router) {
 		r.Group(func(rg chi.Router) {
-			rg.Use(middlewares.AuthMiddleware, apiDocAuthDoc)
+			rg.Use(middlewares.NewAuthMiddleware(server.jwtService), apiDocAuthDoc)
 			rg.Method(http.MethodPost, "/orders", nethttp.NewHandler(uploadOrderInter, nethttp.SuccessStatus(http.StatusOK)))
 			rg.Method(http.MethodGet, "/orders", nethttp.NewHandler(getOrdersInter))
 			rg.Method(http.MethodGet, "/balance", nethttp.NewHandler(getBalanceInter))
