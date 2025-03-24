@@ -30,7 +30,7 @@ func NewLoyaltyAccountTransaction(
 	orderID uuid.UUID,
 	amount CurrencyUnit,
 ) (*LoyaltyAccountTransaction, error) {
-	if transactionType != "withdraw" && transactionType != "accrual" {
+	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
 		return nil, ErrInvalidTransactionType
 	}
 
@@ -71,7 +71,7 @@ func (lat *LoyaltyAccountTransaction) GetAmount() CurrencyUnit {
 
 // Setters
 func (lat *LoyaltyAccountTransaction) SetTransactionType(transactionType string) error {
-	if transactionType != "withdraw" && transactionType != "accrual" {
+	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
 		return ErrInvalidTransactionType
 	}
 	lat.transactionType = transactionType
