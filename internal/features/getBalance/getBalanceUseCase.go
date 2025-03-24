@@ -11,16 +11,16 @@ import (
 	"github.com/swaggest/usecase/status"
 )
 
-// DBLoyaltyAccountTransactionRepository определяет методы для работы с таблицей orders без domain уровня для оптимизации.
-type DBLoyaltyAccountTransactionRepository interface {
-	CalcBalanceAndWithdraw(ctx context.Context, userID string) (*dbModels.LoyaltyAccountCalcDTO, error)
+// DBTransactionRepository определяет методы для работы с таблицей orders без domain уровня для оптимизации.
+type DBTransactionRepository interface {
+	CalcBalanceAndWithdraw(ctx context.Context, userID string) (*dbModels.BalanceCalcDTO, error)
 }
 
 type GetBalanceUseCaseImpl struct {
-	dbLoyaltyRepo DBLoyaltyAccountTransactionRepository
+	dbLoyaltyRepo DBTransactionRepository
 }
 
-func NewGetBalanceUseCase(dbLoyaltyRepo DBLoyaltyAccountTransactionRepository) *GetBalanceUseCaseImpl {
+func NewGetBalanceUseCase(dbLoyaltyRepo DBTransactionRepository) *GetBalanceUseCaseImpl {
 	return &GetBalanceUseCaseImpl{dbLoyaltyRepo: dbLoyaltyRepo}
 }
 

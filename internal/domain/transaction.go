@@ -11,33 +11,30 @@ var (
 	ErrInvalidTransactionType = errors.New("invalid transaction type")
 )
 
-// Представляет доменную модель транзакции счета лояльности.
-type LoyaltyAccountTransaction struct {
+// Представляет доменную модель транзакции лояльности.
+type Transaction struct {
 	id               uuid.UUID
 	createdAt        time.Time
-	loyaltyAccountID uuid.UUID
 	transactionType  string
 	orderID          uuid.UUID
 	amount           CurrencyUnit
 }
 
 // Создает новую транзакцию, если данные корректны.
-func NewLoyaltyAccountTransaction(
+func NewTransaction(
 	id uuid.UUID,
 	createdAt time.Time,
-	loyaltyAccountID uuid.UUID,
 	transactionType string,
 	orderID uuid.UUID,
 	amount CurrencyUnit,
-) (*LoyaltyAccountTransaction, error) {
+) (*Transaction, error) {
 	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
 		return nil, ErrInvalidTransactionType
 	}
 
-	return &LoyaltyAccountTransaction{
+	return &Transaction{
 		id:               id,
 		createdAt:        createdAt,
-		loyaltyAccountID: loyaltyAccountID,
 		transactionType:  transactionType,
 		orderID:          orderID,
 		amount:           amount,
@@ -45,32 +42,28 @@ func NewLoyaltyAccountTransaction(
 }
 
 // Getters
-func (lat *LoyaltyAccountTransaction) GetID() uuid.UUID {
+func (lat *Transaction) GetID() uuid.UUID {
 	return lat.id
 }
 
-func (lat *LoyaltyAccountTransaction) GetCreatedAt() time.Time {
+func (lat *Transaction) GetCreatedAt() time.Time {
 	return lat.createdAt
 }
 
-func (lat *LoyaltyAccountTransaction) GetLoyaltyAccountID() uuid.UUID {
-	return lat.loyaltyAccountID
-}
-
-func (lat *LoyaltyAccountTransaction) GetTransactionType() string {
+func (lat *Transaction) GetTransactionType() string {
 	return lat.transactionType
 }
 
-func (lat *LoyaltyAccountTransaction) GetOrderID() uuid.UUID {
+func (lat *Transaction) GetOrderID() uuid.UUID {
 	return lat.orderID
 }
 
-func (lat *LoyaltyAccountTransaction) GetAmount() CurrencyUnit {
+func (lat *Transaction) GetAmount() CurrencyUnit {
 	return lat.amount
 }
 
 // Setters
-func (lat *LoyaltyAccountTransaction) SetTransactionType(transactionType string) error {
+func (lat *Transaction) SetTransactionType(transactionType string) error {
 	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
 		return ErrInvalidTransactionType
 	}
@@ -78,10 +71,10 @@ func (lat *LoyaltyAccountTransaction) SetTransactionType(transactionType string)
 	return nil
 }
 
-func (lat *LoyaltyAccountTransaction) SetOrderID(orderID uuid.UUID) {
+func (lat *Transaction) SetOrderID(orderID uuid.UUID) {
 	lat.orderID = orderID
 }
 
-func (lat *LoyaltyAccountTransaction) SetAmount(amount CurrencyUnit) {
+func (lat *Transaction) SetAmount(amount CurrencyUnit) {
 	lat.amount = amount
 }

@@ -42,7 +42,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)
 
-	loyaltyTrRepo := repositories.NewLoyaltyAccountTransactionImplRepository(database)
+	loyaltyTrRepo := repositories.NewTransactionImplRepository(database)
 	getBalanceUseCase := getBalance.NewGetBalanceUseCase(loyaltyTrRepo)
 
 	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase()

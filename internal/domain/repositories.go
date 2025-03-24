@@ -27,10 +27,9 @@ type BonusCalculationRepository interface {
 	FindByOrderID(ctx context.Context, orderID string) (*BonusCalculation, error)
 }
 
-// LoyaltyAccountTransactionRepository определяет методы для работы с таблицей loyalty_account_transactions.
-type LoyaltyAccountTransactionRepository interface {
-	Create(ctx context.Context, transaction LoyaltyAccountTransaction) (string, error)
-	FindByID(ctx context.Context, id string) (*LoyaltyAccountTransaction, error)
-	FindByLoyaltyAccountID(ctx context.Context, loyaltyAccountID string) ([]LoyaltyAccountTransaction, error)
-	FindByOrderID(ctx context.Context, orderID string) ([]LoyaltyAccountTransaction, error)
+// TransactionRepository определяет методы для работы с таблицей transactions.
+type TransactionRepository interface {
+	Create(ctx context.Context, transaction Transaction) (string, error)
+	FindByID(ctx context.Context, id string) (*Transaction, error)
+	FindByOrderID(ctx context.Context, orderID string) ([]Transaction, error)
 }
