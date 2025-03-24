@@ -23,7 +23,6 @@ CREATE TABLE bonus_calculations (
 CREATE TABLE loyalty_account_transactions (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    loyalty_account_id UUID NOT NULL REFERENCES loyalty_accounts(id) ON DELETE CASCADE,
     transaction_type TEXT NOT NULL CHECK (transaction_type IN ('WITHDRAW', 'ACCRUAL')),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE
     amount INTEGER NOT NULL DEFAULT 0
