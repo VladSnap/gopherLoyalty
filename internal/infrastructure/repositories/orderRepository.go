@@ -82,8 +82,8 @@ func convertOrders(dbOrders []dbModels.Order) ([]domain.Order, error) {
 
 func (r *OrderImplRepository) FindByUserID(ctx context.Context, userID string) ([]dbModels.OrderGetDTO, error) {
 	query := `SELECT o.number, o.uploaded_at, o.status, b.accrual
-	FROM orders as o
-	LEFT JOIN bonus_calculations as b ON o.id = b.order_id
+	FROM orders o
+	LEFT JOIN bonus_calculations b ON o.id = b.order_id
 	WHERE o.user_id = $1`
 	var orders []dbModels.OrderGetDTO
 	err := r.db.SelectContext(ctx, &orders, query, userID)

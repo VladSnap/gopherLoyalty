@@ -17,6 +17,12 @@ type LoyaltyAccountTransaction struct {
 	Amount           int       `db:"amount"`             // int
 }
 
+// Представляет DTO для расчета баланса и списаний.
+type LoyaltyAccountCalcDTO struct {
+	Balance       int `db:"balance"`
+	WithdrawTotal int `db:"withdrawtotal"`
+}
+
 // Преобразует DBLoyaltyAccountTransaction в доменную модель LoyaltyAccountTransaction.
 func (dlat *LoyaltyAccountTransaction) ToDomain() (*domain.LoyaltyAccountTransaction, error) {
 	id, err := uuid.Parse(dlat.ID)

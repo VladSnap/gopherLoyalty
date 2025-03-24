@@ -13,8 +13,8 @@ type LoyaltyAccountImplRepository struct {
 	db *sqlx.DB
 }
 
-func NewLoyaltyAccountImplRepository(db *sqlx.DB) *LoyaltyAccountImplRepository {
-	return &LoyaltyAccountImplRepository{db: db}
+func NewLoyaltyAccountImplRepository(db *DatabaseLoyalty) *LoyaltyAccountImplRepository {
+	return &LoyaltyAccountImplRepository{db: db.DB}
 }
 
 func (r *LoyaltyAccountImplRepository) Create(ctx context.Context, loyaltyAccount dbModels.LoyaltyAccount) (string, error) {

@@ -13,8 +13,8 @@ type LoyaltyAccountTransactionImplRepository struct {
 	db *sqlx.DB
 }
 
-func NewLoyaltyAccountTransactionImplRepository(db *sqlx.DB) *LoyaltyAccountTransactionImplRepository {
-	return &LoyaltyAccountTransactionImplRepository{db: db}
+func NewLoyaltyAccountTransactionImplRepository(db *DatabaseLoyalty) *LoyaltyAccountTransactionImplRepository {
+	return &LoyaltyAccountTransactionImplRepository{db: db.DB}
 }
 
 func (r *LoyaltyAccountTransactionImplRepository) Create(ctx context.Context, transaction dbModels.LoyaltyAccountTransaction) (string, error) {
@@ -57,4 +57,22 @@ func (r *LoyaltyAccountTransactionImplRepository) FindByOrderID(ctx context.Cont
 		return nil, errors.Wrap(ErrDatabase, "failed to find loyalty account transactions by order ID")
 	}
 	return transactions, nil
+}
+
+func (r *LoyaltyAccountTransactionImplRepository) CalcBalanceAndWithdraw(ctx context.Context, userID string) (*dbModels.LoyaltyAccountCalcDTO, error) {
+	query := `SELECT
+            SUM(CASE WHEN transaction_type = 'ACCRUAL' THEN amount ELSE -amount END) AS balance,
+            SUM(CASE WHEN transaction_type = 'WITHDRAW' THEN amount ELSE 0 END) AS withdrawTotal
+        FROM loyalty_account_transactions lat
+        JOIN orders o ON lat.order_id = o.id
+        WHERE o.user_id = $1`
+	var calc dbModels.LoyaltyAccountCalcDTO
+	err := r.db.GetContext(ctx, &calc, query, userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.Wrapf(ErrNotFound, "loyalty account transaction with user_id %s not found", userID)
+		}
+		return nil, errors.Wrap(ErrDatabase, "failed to find loyalty account transaction by ID")
+	}
+	return &calc, nil
 }
