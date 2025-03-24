@@ -28,6 +28,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	userRepo := repositories.NewUserImplRepository(database)
 	orderRepo := repositories.NewOrderImplRepository(database)
+	transRepo := repositories.NewTransactionImplRepository(database)
 	passService := services.NewPasswordServiceImpl()
 	jwtService := services.NewJWTTokenService()
 
@@ -42,12 +43,11 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)
 
-	loyaltyTrRepo := repositories.NewTransactionImplRepository(database)
-	getBalanceUseCase := getBalance.NewGetBalanceUseCase(loyaltyTrRepo)
+	getBalanceUseCase := getBalance.NewGetBalanceUseCase(transRepo)
 
 	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase()
 
-	getWithdrawalsUseCase := getWithdrawals.NewGetWithdrawalsUseCase()
+	getWithdrawalsUseCase := getWithdrawals.NewGetWithdrawalsUseCase(transRepo)
 
 	server := NewApiServer(config,
 		jwtService,

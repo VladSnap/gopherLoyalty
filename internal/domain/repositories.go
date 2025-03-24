@@ -31,5 +31,4 @@ type BonusCalculationRepository interface {
 type TransactionRepository interface {
 	Create(ctx context.Context, transaction Transaction) (string, error)
 	FindByID(ctx context.Context, id string) (*Transaction, error)
-	FindByOrderID(ctx context.Context, orderID string) ([]Transaction, error)
 }

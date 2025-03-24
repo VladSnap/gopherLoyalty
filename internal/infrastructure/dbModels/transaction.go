@@ -16,6 +16,12 @@ type Transaction struct {
 	Amount          int       `db:"amount"`     // int
 }
 
+type TransactionDTO struct {
+	OrderNumber string    `db:"order_number"`
+	Amount      int       `db:"amount"`
+	CreatedAt   time.Time `db:"created_at"`
+}
+
 // Представляет DTO для расчета баланса и списаний.
 type BalanceCalcDTO struct {
 	Balance       *int `db:"balance"`

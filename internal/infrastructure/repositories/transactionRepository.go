@@ -39,10 +39,13 @@ func (r *TransactionImplRepository) FindByID(ctx context.Context, id string) (*d
 	return &transaction, nil
 }
 
-func (r *TransactionImplRepository) FindByOrderID(ctx context.Context, orderID string) ([]dbModels.Transaction, error) {
-	query := `SELECT * FROM transactions WHERE order_id = $1`
-	var transactions []dbModels.Transaction
-	err := r.db.SelectContext(ctx, &transactions, query, orderID)
+func (r *TransactionImplRepository) FindByUserID(ctx context.Context, userID string) ([]dbModels.TransactionDTO, error) {
+	query := `SELECT o.number as order_number, t.amount, t.created_at
+	FROM transactions t
+	JOIN orders o ON t.order_id = o.id
+	WHERE o.user_id = $1`
+	var transactions []dbModels.TransactionDTO
+	err := r.db.SelectContext(ctx, &transactions, query, userID)
 	if err != nil {
 		return nil, errors.Wrap(ErrDatabase, "failed to find loyalty account transactions by order ID")
 	}
@@ -53,8 +56,8 @@ func (r *TransactionImplRepository) CalcBalanceAndWithdraw(ctx context.Context, 
 	query := `SELECT
             SUM(CASE WHEN type = 'ACCRUAL' THEN amount ELSE -amount END) AS balance,
             SUM(CASE WHEN type = 'WITHDRAW' THEN amount ELSE 0 END) AS withdrawTotal
-        FROM transactions lat
-        JOIN orders o ON lat.order_id = o.id
+        FROM transactions t
+        JOIN orders o ON t.order_id = o.id
         WHERE o.user_id = $1`
 	var calc dbModels.BalanceCalcDTO
 	err := r.db.GetContext(ctx, &calc, query, userID)

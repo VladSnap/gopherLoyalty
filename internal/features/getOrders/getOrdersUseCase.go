@@ -43,9 +43,7 @@ func (uc *GetOrdersUseCaseImpl) Execute(ctx context.Context, input *interface{},
 				Accrual:    ord.Accrual,
 			})
 		}
-	} /*else {
-		*output = make(OrderListResponse, 0, 1)
-	}*/
+	}
 
 	return nil
 }
