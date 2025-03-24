@@ -9,17 +9,17 @@ import (
 
 // Представляет таблицу транзакций по счетам лояльности.
 type Transaction struct {
-	ID              string    `db:"id"`               // uuid
-	CreatedAt       time.Time `db:"created_at"`       // datetime
-	TransactionType string    `db:"type"` // enum (withdraw, accrual)
-	OrderID         string    `db:"order_id"`         // -> order.ID (многие к 1)
-	Amount          int       `db:"amount"`           // int
+	ID              string    `db:"id"`         // uuid
+	CreatedAt       time.Time `db:"created_at"` // datetime
+	TransactionType string    `db:"type"`       // enum (withdraw, accrual)
+	OrderID         string    `db:"order_id"`   // -> order.ID (многие к 1)
+	Amount          int       `db:"amount"`     // int
 }
 
 // Представляет DTO для расчета баланса и списаний.
 type BalanceCalcDTO struct {
-	Balance       int `db:"balance"`
-	WithdrawTotal int `db:"withdrawtotal"`
+	Balance       *int `db:"balance"`
+	WithdrawTotal *int `db:"withdrawtotal"`
 }
 
 // Преобразует DBTransaction в доменную модель Transaction.

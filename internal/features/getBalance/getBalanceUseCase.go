@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
+	"github.com/VladSnap/gopherLoyalty/internal/helpers"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
 	"github.com/google/uuid"
@@ -35,7 +36,7 @@ func (uc *GetBalanceUseCaseImpl) Execute(ctx context.Context, input *interface{}
 		return status.Wrap(err, status.Unknown)
 	}
 
-	output.Current = float64(domain.CurrencyUnit(calc.Balance).ToMajorUnit())
-	output.Withdrawn = float64(domain.CurrencyUnit(calc.WithdrawTotal).ToMajorUnit())
+	output.Current = float64(domain.CurrencyUnit(helpers.GetOrDefaultInt(calc.Balance, 0)).ToMajorUnit())
+	output.Withdrawn = float64(domain.CurrencyUnit(helpers.GetOrDefaultInt(calc.WithdrawTotal, 0)).ToMajorUnit())
 	return nil
 }

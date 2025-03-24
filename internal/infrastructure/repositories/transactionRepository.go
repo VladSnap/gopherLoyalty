@@ -59,9 +59,6 @@ func (r *TransactionImplRepository) CalcBalanceAndWithdraw(ctx context.Context, 
 	var calc dbModels.BalanceCalcDTO
 	err := r.db.GetContext(ctx, &calc, query, userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.Wrapf(ErrNotFound, "loyalty account transaction with user_id %s not found", userID)
-		}
 		return nil, errors.Wrap(ErrDatabase, "failed to find loyalty account transaction by ID")
 	}
 	return &calc, nil
