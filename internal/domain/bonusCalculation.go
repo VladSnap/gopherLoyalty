@@ -16,7 +16,7 @@ type BonusCalculation struct {
 	id            uuid.UUID
 	orderID       uuid.UUID
 	loyaltyStatus string
-	accrual       int
+	accrual       CurrencyUnit
 }
 
 // Создает новый расчет бонусов, если данные корректны.
@@ -32,7 +32,7 @@ func NewBonusCalculation(id, orderID uuid.UUID, loyaltyStatus string, accrual in
 		id:            id,
 		orderID:       orderID,
 		loyaltyStatus: loyaltyStatus,
-		accrual:       accrual,
+		accrual:       CurrencyUnit(accrual),
 	}, nil
 }
 
@@ -49,7 +49,7 @@ func (bc *BonusCalculation) GetLoyaltyStatus() string {
 	return bc.loyaltyStatus
 }
 
-func (bc *BonusCalculation) GetAccrual() int {
+func (bc *BonusCalculation) GetAccrual() CurrencyUnit {
 	return bc.accrual
 }
 
@@ -62,7 +62,7 @@ func (bc *BonusCalculation) SetLoyaltyStatus(loyaltyStatus string) error {
 	return nil
 }
 
-func (bc *BonusCalculation) SetAccrual(accrual int) error {
+func (bc *BonusCalculation) SetAccrual(accrual CurrencyUnit) error {
 	if accrual < 0 {
 		return ErrInvalidAccrual
 	}

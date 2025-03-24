@@ -28,8 +28,8 @@ func (dla *LoyaltyAccount) ToDomain() (*domain.LoyaltyAccount, error) {
 	return domain.NewLoyaltyAccount(
 		id,
 		userID,
-		dla.Balance,
-		dla.WithdrawTotal,
+		domain.CurrencyUnit(dla.Balance),
+		domain.CurrencyUnit(dla.WithdrawTotal),
 	)
 }
 
@@ -38,7 +38,7 @@ func DBLoyaltyAccountFromDomain(la *domain.LoyaltyAccount) *LoyaltyAccount {
 	return &LoyaltyAccount{
 		ID:            la.GetID().String(),
 		UserID:        la.GetUserID().String(),
-		Balance:       la.GetBalance(),
-		WithdrawTotal: la.GetWithdrawTotal(),
+		Balance:       int(la.GetBalance()),
+		WithdrawTotal: int(la.GetWithdrawTotal()),
 	}
 }

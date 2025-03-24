@@ -39,6 +39,6 @@ func DBBonusCalculationFromDomain(bc *domain.BonusCalculation) *BonusCalculation
 		ID:            bc.GetID().String(),
 		OrderID:       bc.GetOrderID().String(),
 		LoyaltyStatus: bc.GetLoyaltyStatus(),
-		Accrual:       bc.GetAccrual(),
+		Accrual:       int(bc.GetAccrual()),
 	}
 }

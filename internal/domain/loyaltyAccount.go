@@ -15,12 +15,12 @@ var (
 type LoyaltyAccount struct {
 	id            uuid.UUID
 	userID        uuid.UUID
-	balance       int
-	withdrawTotal int
+	balance       CurrencyUnit
+	withdrawTotal CurrencyUnit
 }
 
 // Создает новый счет лояльности, если данные корректны.
-func NewLoyaltyAccount(id, userID uuid.UUID, balance, withdrawTotal int) (*LoyaltyAccount, error) {
+func NewLoyaltyAccount(id, userID uuid.UUID, balance, withdrawTotal CurrencyUnit) (*LoyaltyAccount, error) {
 	if balance < 0 {
 		return nil, ErrInvalidBalance
 	}
@@ -45,16 +45,16 @@ func (la *LoyaltyAccount) GetUserID() uuid.UUID {
 	return la.userID
 }
 
-func (la *LoyaltyAccount) GetBalance() int {
+func (la *LoyaltyAccount) GetBalance() CurrencyUnit {
 	return la.balance
 }
 
-func (la *LoyaltyAccount) GetWithdrawTotal() int {
+func (la *LoyaltyAccount) GetWithdrawTotal() CurrencyUnit {
 	return la.withdrawTotal
 }
 
 // Setters
-func (la *LoyaltyAccount) SetBalance(balance int) error {
+func (la *LoyaltyAccount) SetBalance(balance CurrencyUnit) error {
 	if balance < 0 {
 		return ErrInvalidBalance
 	}
@@ -62,7 +62,7 @@ func (la *LoyaltyAccount) SetBalance(balance int) error {
 	return nil
 }
 
-func (la *LoyaltyAccount) SetWithdrawTotal(withdrawTotal int) error {
+func (la *LoyaltyAccount) SetWithdrawTotal(withdrawTotal CurrencyUnit) error {
 	if withdrawTotal < 0 {
 		return ErrInvalidWithdrawTotal
 	}

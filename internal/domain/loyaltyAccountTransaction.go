@@ -18,6 +18,7 @@ type LoyaltyAccountTransaction struct {
 	loyaltyAccountID uuid.UUID
 	transactionType  string
 	orderID          uuid.UUID
+	amount           CurrencyUnit
 }
 
 // Создает новую транзакцию, если данные корректны.
@@ -27,6 +28,7 @@ func NewLoyaltyAccountTransaction(
 	loyaltyAccountID uuid.UUID,
 	transactionType string,
 	orderID uuid.UUID,
+	amount CurrencyUnit,
 ) (*LoyaltyAccountTransaction, error) {
 	if transactionType != "withdraw" && transactionType != "accrual" {
 		return nil, ErrInvalidTransactionType
@@ -38,6 +40,7 @@ func NewLoyaltyAccountTransaction(
 		loyaltyAccountID: loyaltyAccountID,
 		transactionType:  transactionType,
 		orderID:          orderID,
+		amount:           amount,
 	}, nil
 }
 
@@ -62,6 +65,10 @@ func (lat *LoyaltyAccountTransaction) GetOrderID() uuid.UUID {
 	return lat.orderID
 }
 
+func (lat *LoyaltyAccountTransaction) GetAmount() CurrencyUnit {
+	return lat.amount
+}
+
 // Setters
 func (lat *LoyaltyAccountTransaction) SetTransactionType(transactionType string) error {
 	if transactionType != "withdraw" && transactionType != "accrual" {
@@ -73,4 +80,8 @@ func (lat *LoyaltyAccountTransaction) SetTransactionType(transactionType string)
 
 func (lat *LoyaltyAccountTransaction) SetOrderID(orderID uuid.UUID) {
 	lat.orderID = orderID
+}
+
+func (lat *LoyaltyAccountTransaction) SetAmount(amount CurrencyUnit) {
+	lat.amount = amount
 }

@@ -14,6 +14,7 @@ type LoyaltyAccountTransaction struct {
 	LoyaltyAccountID string    `db:"loyalty_account_id"` // -> loyaltyAccount.ID (многие к 1)
 	TransactionType  string    `db:"transaction_type"`   // enum (withdraw, accrual)
 	OrderID          string    `db:"order_id"`           // -> order.ID (многие к 1)
+	Amount           int       `db:"amount"`             // int
 }
 
 // Преобразует DBLoyaltyAccountTransaction в доменную модель LoyaltyAccountTransaction.
@@ -39,6 +40,7 @@ func (dlat *LoyaltyAccountTransaction) ToDomain() (*domain.LoyaltyAccountTransac
 		loyaltyAccountID,
 		dlat.TransactionType,
 		orderID,
+		domain.CurrencyUnit(dlat.Amount),
 	)
 }
 

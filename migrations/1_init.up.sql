@@ -33,4 +33,5 @@ CREATE TABLE loyalty_account_transactions (
     loyalty_account_id UUID NOT NULL REFERENCES loyalty_accounts(id) ON DELETE CASCADE,
     transaction_type TEXT NOT NULL CHECK (transaction_type IN ('withdraw', 'accrual')),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE
+    amount INTEGER NOT NULL DEFAULT 0
 );
