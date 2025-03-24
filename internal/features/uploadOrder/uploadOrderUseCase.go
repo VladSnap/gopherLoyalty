@@ -44,6 +44,6 @@ func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrder
 			return status.Wrap(errors.New("unknown error"), status.Unknown)
 		}
 	}
-	output.WithHttpStatus(http.StatusCreated)
+	output.WithHttpStatus(http.StatusAccepted)
 	return nil
 }
