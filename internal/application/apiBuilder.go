@@ -40,7 +40,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	uploadOrderCmd := uploadOrder.NewUploadOrderCmdHandler(userRepo, orderRepo)
 	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase(uploadOrderCmd)
 
-	getOrdersUseCase := getOrders.NewGetOrdersUseCase()
+	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)
 
 	getBalanceUseCase := getBalance.NewGetBalanceUseCase()
 

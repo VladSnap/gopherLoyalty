@@ -18,6 +18,14 @@ type Order struct {
 	Status             string    `db:"status"`                         // enum (NEW, INVALID, PROCESSING, PROCESSED)
 }
 
+// OrderGetDTO модель для маппинга select+join запроса в DTO
+type OrderGetDTO struct {
+	Number     string    `db:"number"`
+	UploadedAt time.Time `db:"uploaded_at"`
+	Accrual    *float64  `db:"accrual"`
+	Status     string    `db:"status"`
+}
+
 // Преобразует DBOrder в доменную модель Order.
 func (dbo *Order) ToDomain() (*domain.Order, error) {
 	id, err := uuid.Parse(dbo.ID)
@@ -64,5 +72,14 @@ func DBOrderFromDomain(order *domain.Order) *Order {
 		UserID:             order.GetUserID().String(),
 		BonusCalculationID: bonusCalculationID,
 		Status:             order.GetStatus().String(),
+	}
+}
+
+func (dbo *Order) ToGetDTO(accrual *float64) *OrderGetDTO {
+	return &OrderGetDTO{
+		Number:     dbo.Number,
+		UploadedAt: dbo.UploadedAt,
+		Accrual:    accrual,
+		Status:     dbo.Status,
 	}
 }

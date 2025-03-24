@@ -55,16 +55,6 @@ func (r *OrderImplRepository) FindByNumber(ctx context.Context, number string) (
 	return order.ToDomain()
 }
 
-func (r *OrderImplRepository) FindByUserID(ctx context.Context, userID string) ([]domain.Order, error) {
-	query := `SELECT * FROM orders WHERE user_id = $1`
-	var orders []dbModels.Order
-	err := r.db.SelectContext(ctx, &orders, query, userID)
-	if err != nil {
-		return nil, errors.Wrap(ErrDatabase, "failed to find orders by user ID")
-	}
-	return convertOrders(orders)
-}
-
 func (r *OrderImplRepository) Update(ctx context.Context, order *domain.Order) error {
 	query := `UPDATE orders SET number = :number, uploaded_at = :uploaded_at, user_id = :user_id, status = :status WHERE id = :id`
 	dbOrder := dbModels.DBOrderFromDomain(order)
@@ -86,4 +76,20 @@ func convertOrders(dbOrders []dbModels.Order) ([]domain.Order, error) {
 		domOrders[i] = *domOrder
 	}
 	return domOrders, nil
+}
+
+// DB repo implements
+
+func (r *OrderImplRepository) FindByUserID(ctx context.Context, userID string) ([]dbModels.OrderGetDTO, error) {
+	query := `SELECT o.number, o.uploaded_at, o.status, b.accrual
+	FROM orders as o
+	LEFT JOIN bonus_calculations as b ON o.id = b.order_id
+	WHERE o.user_id = $1`
+	var orders []dbModels.OrderGetDTO
+	err := r.db.SelectContext(ctx, &orders, query, userID)
+	if err != nil {
+		return nil, errors.Wrap(ErrDatabase, "failed to find orders by user ID")
+	}
+
+	return orders, nil
 }

@@ -2,18 +2,50 @@ package getOrders
 
 import (
 	"context"
+	"errors"
+
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/google/uuid"
+	"github.com/swaggest/usecase/status"
 )
 
-type GetOrdersUseCaseImpl struct {
+// DBOrderRepository определяет методы для работы с таблицей orders без domain уровня для оптимизации.
+type DBOrderRepository interface {
+	FindByUserID(ctx context.Context, userID string) ([]dbModels.OrderGetDTO, error)
 }
 
-func NewGetOrdersUseCase() *GetOrdersUseCaseImpl {
-	return &GetOrdersUseCaseImpl{}
+type GetOrdersUseCaseImpl struct {
+	dbOrderRepo DBOrderRepository
+}
+
+func NewGetOrdersUseCase(dbOrderRepo DBOrderRepository) *GetOrdersUseCaseImpl {
+	return &GetOrdersUseCaseImpl{dbOrderRepo: dbOrderRepo}
 }
 
 func (uc *GetOrdersUseCaseImpl) Execute(ctx context.Context, input *interface{}, output *OrderListResponse) error {
-	*output = append(*output, OrderResponse{Number: "1"})
-	*output = append(*output, OrderResponse{Number: "2"})
-	*output = append(*output, OrderResponse{Number: "3"})
+	currentUserID, ok := ctx.Value(api.KeyContext("UserID")).(uuid.UUID)
+	if !ok {
+		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
+	}
+
+	orders, err := uc.dbOrderRepo.FindByUserID(ctx, currentUserID.String())
+	if err != nil {
+		return status.Wrap(err, status.Unknown)
+	}
+
+	if len(orders) != 0 {
+		for _, ord := range orders {
+			*output = append(*output, OrderResponse{
+				Number:     ord.Number,
+				Status:     ord.Status,
+				UploadedAt: ord.UploadedAt,
+				Accrual:    ord.Accrual,
+			})
+		}
+	} /*else {
+		*output = make(OrderListResponse, 0, 1)
+	}*/
+
 	return nil
 }

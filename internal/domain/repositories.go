@@ -17,7 +17,6 @@ type OrderRepository interface {
 	Create(ctx context.Context, order *Order) error
 	FindByID(ctx context.Context, id string) (*Order, error)
 	FindByNumber(ctx context.Context, number string) (*Order, error)
-	FindByUserID(ctx context.Context, userID string) ([]Order, error)
 	Update(ctx context.Context, order *Order) error
 }
 
