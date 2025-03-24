@@ -20,13 +20,6 @@ CREATE TABLE bonus_calculations (
     accrual INTEGER NOT NULL
 );
 
-CREATE TABLE loyalty_accounts (
-    id UUID PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-    balance INTEGER NOT NULL DEFAULT 0,
-    withdraw_total INTEGER NOT NULL DEFAULT 0
-);
-
 CREATE TABLE loyalty_account_transactions (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
