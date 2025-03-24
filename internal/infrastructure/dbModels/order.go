@@ -1,6 +1,7 @@
 package dbModels
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
@@ -21,7 +22,12 @@ type Order struct {
 func (dbo *Order) ToDomain() (*domain.Order, error) {
 	id, err := uuid.Parse(dbo.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed ParseUniqueID for ID: %w", err)
+	}
+
+	userId, err := domain.ParseUniqueID(dbo.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed ParseUniqueID for UserID: %w", err)
 	}
 
 	var bonusCalculationID *uuid.UUID
@@ -33,11 +39,11 @@ func (dbo *Order) ToDomain() (*domain.Order, error) {
 		bonusCalculationID = &parsedUUID
 	}
 
-	return domain.NewOrder(
+	return domain.CreateOrderFromDB(
 		id,
 		dbo.Number,
 		dbo.UploadedAt,
-		dbo.UserID,
+		userId,
 		dbo.Status,
 		bonusCalculationID,
 	)
@@ -55,8 +61,8 @@ func DBOrderFromDomain(order *domain.Order) *Order {
 		ID:                 order.GetID().String(),
 		Number:             order.GetNumber(),
 		UploadedAt:         order.GetUploadedAt(),
-		UserID:             order.GetUserID(),
+		UserID:             order.GetUserID().String(),
 		BonusCalculationID: bonusCalculationID,
-		Status:             order.GetStatus(),
+		Status:             order.GetStatus().String(),
 	}
 }

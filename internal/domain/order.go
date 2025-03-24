@@ -2,15 +2,18 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 var (
-	ErrInvalidOrderNumber = errors.New("order number is required")
-	ErrInvalidUserID      = errors.New("user ID is required")
-	ErrInvalidStatus      = errors.New("status is required")
+	ErrInvalidOrderNumber          = errors.New("order number is required")
+	ErrInvalidUserID               = errors.New("user ID is required")
+	ErrInvalidStatus               = errors.New("status is required")
+	ErrAlreadyUploadedOrderCurrent = errors.New("order already uploaded by current user")
+	ErrAlreadyUploadedOrderAnother = errors.New("order already uploaded by another user")
 )
 
 // Order представляет доменную модель заказа.
@@ -18,30 +21,44 @@ type Order struct {
 	id                 uuid.UUID
 	number             string
 	uploadedAt         time.Time
-	userID             string
+	userID             uuid.UUID
 	bonusCalculationID *uuid.UUID // Опциональное поле
-	status             string
+	status             OrderStatus
 }
 
 // NewOrder создает новый заказ, если данные корректны.
-func NewOrder(id uuid.UUID, number string, uploadedAt time.Time, userID, status string, bonusCalculationID *uuid.UUID) (*Order, error) {
-	if number == "" {
+func NewOrder(number string, uploadedAt time.Time,
+	userID uuid.UUID) (*Order, error) {
+	if number == "" || !IsValidLuhn(number) {
 		return nil, ErrInvalidOrderNumber
 	}
-	if userID == "" {
+	if userID == uuid.Nil {
 		return nil, ErrInvalidUserID
 	}
-	if status == "" {
-		return nil, ErrInvalidStatus
-	}
 
+	return &Order{
+		id:                 GenerateUniqueID(),
+		number:             number,
+		uploadedAt:         uploadedAt,
+		userID:             userID,
+		bonusCalculationID: nil,
+		status:             OrderStatusNew,
+	}, nil
+}
+
+func CreateOrderFromDB(id uuid.UUID, number string, uploadedAt time.Time,
+	userID uuid.UUID, status string, bonusCalculationID *uuid.UUID) (*Order, error) {
+	oStatus, err := ParseOrderStatus(status)
+	if err != nil {
+		return nil, fmt.Errorf("failed ParseOrderStatus: %w", err)
+	}
 	return &Order{
 		id:                 id,
 		number:             number,
 		uploadedAt:         uploadedAt,
 		userID:             userID,
 		bonusCalculationID: bonusCalculationID,
-		status:             status,
+		status:             oStatus,
 	}, nil
 }
 
@@ -58,7 +75,7 @@ func (o *Order) GetUploadedAt() time.Time {
 	return o.uploadedAt
 }
 
-func (o *Order) GetUserID() string {
+func (o *Order) GetUserID() uuid.UUID {
 	return o.userID
 }
 
@@ -66,7 +83,7 @@ func (o *Order) GetBonusCalculationID() *uuid.UUID {
 	return o.bonusCalculationID
 }
 
-func (o *Order) GetStatus() string {
+func (o *Order) GetStatus() OrderStatus {
 	return o.status
 }
 
@@ -83,8 +100,8 @@ func (o *Order) SetUploadedAt(uploadedAt time.Time) {
 	o.uploadedAt = uploadedAt
 }
 
-func (o *Order) SetUserID(userID string) error {
-	if userID == "" {
+func (o *Order) SetUserID(userID uuid.UUID) error {
+	if userID == uuid.Nil {
 		return ErrInvalidUserID
 	}
 	o.userID = userID
@@ -95,10 +112,7 @@ func (o *Order) SetBonusCalculationID(bonusCalculationID *uuid.UUID) {
 	o.bonusCalculationID = bonusCalculationID
 }
 
-func (o *Order) SetStatus(status string) error {
-	if status == "" {
-		return ErrInvalidStatus
-	}
+func (o *Order) SetStatus(status OrderStatus) error {
 	o.status = status
 	return nil
 }

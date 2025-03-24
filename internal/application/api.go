@@ -159,7 +159,7 @@ func (server *SwaggestApiServer) registerRoutes(service *web.Service) error {
 	service.Route("/api/user", func(r chi.Router) {
 		r.Group(func(rg chi.Router) {
 			rg.Use(middlewares.NewAuthMiddleware(server.jwtService), apiDocAuthDoc)
-			rg.Method(http.MethodPost, "/orders", nethttp.NewHandler(uploadOrderInter, nethttp.SuccessStatus(http.StatusOK)))
+			rg.Method(http.MethodPost, "/orders", nethttp.NewHandler(uploadOrderInter))
 			rg.Method(http.MethodGet, "/orders", nethttp.NewHandler(getOrdersInter))
 			rg.Method(http.MethodGet, "/balance", nethttp.NewHandler(getBalanceInter))
 			rg.Method(http.MethodPost, "/balance/withdraw", nethttp.NewHandler(wthdrawBalanceInter, nethttp.SuccessStatus(http.StatusOK)))

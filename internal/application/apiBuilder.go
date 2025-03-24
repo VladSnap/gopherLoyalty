@@ -27,6 +27,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	}
 
 	userRepo := repositories.NewUserImplRepository(database)
+	orderRepo := repositories.NewOrderImplRepository(database)
 	passService := services.NewPasswordServiceImpl()
 	jwtService := services.NewJWTTokenService()
 
@@ -36,7 +37,8 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	loginCmd := loginUser.NewRegistrationUserCmdHandler(userRepo, passService)
 	loginUseCase := loginUser.NewLoginUserUseCase(loginCmd, jwtService)
 
-	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase()
+	uploadOrderCmd := uploadOrder.NewUploadOrderCmdHandler(userRepo, orderRepo)
+	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase(uploadOrderCmd)
 
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase()
 

@@ -34,7 +34,7 @@ func (s *RegistrationUserCmdHandlerImpl) Execute(ctx context.Context, login stri
 	}
 
 	// Создаем нового пользователя
-	user, err := domain.NewUser(domain.GenerateUniqueID(), login, hashedPassword)
+	user, err := domain.NewUser(login, hashedPassword)
 	if err != nil {
 		return nil, fmt.Errorf("failed create new user: %w", err)
 	}

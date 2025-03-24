@@ -9,3 +9,4 @@ func GenerateUniqueID() uuid.UUID {
 func ParseUniqueID(uuidValue string) (uuid.UUID, error) {
 	return uuid.Parse(uuidValue)
 }
+

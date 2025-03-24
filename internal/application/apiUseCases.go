@@ -8,6 +8,7 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/features/getWithdrawals"
 	"github.com/VladSnap/gopherLoyalty/internal/features/loginUser"
 	"github.com/VladSnap/gopherLoyalty/internal/features/registrationUser"
+	"github.com/VladSnap/gopherLoyalty/internal/features/uploadOrder"
 	"github.com/VladSnap/gopherLoyalty/internal/features/withdrawBalance"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 )
@@ -21,7 +22,7 @@ type LoginUserUseCase interface {
 }
 
 type UploadOrderUseCase interface {
-	Execute(ctx context.Context, input string, output *api.EmptyBody) error
+	Execute(ctx context.Context, input uploadOrder.UploadOrderRequest, output *api.HttpStatusResponse) error
 }
 
 type GetOrdersUseCase interface {
