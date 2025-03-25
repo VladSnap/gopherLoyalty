@@ -38,7 +38,7 @@ func NewAccrualWorker(orderRepo domain.OrderRepository,
 	}
 }
 
-func (s *AccrualWorkerImpl) StartPolling(ctx context.Context) {
+func (s *AccrualWorkerImpl) StartPolling() {
 	ctx, cancel := context.WithCancel(context.Background())
 	s.ctxCancel = cancel
 

@@ -1,7 +1,6 @@
 package application
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -38,7 +37,7 @@ func Run() {
 		panic(err)
 	}
 
-	accrualWorker.StartPolling(context.Background())
+	accrualWorker.StartPolling()
 
 	err = apiServer.Start()
 

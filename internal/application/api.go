@@ -29,7 +29,7 @@ type ApiServer interface {
 }
 
 type AccrualWorker interface {
-	StartPolling(ctx context.Context)
+	StartPolling()
 }
 
 type SwaggestApiServer struct {
