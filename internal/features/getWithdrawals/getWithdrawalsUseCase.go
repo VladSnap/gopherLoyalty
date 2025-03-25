@@ -12,15 +12,15 @@ import (
 	"github.com/swaggest/usecase/status"
 )
 
-type DBTransactionRepository interface {
-	FindWithdrawalByUserID(ctx context.Context, userID string) ([]dbModels.TransactionDTO, error)
+type DBWithdrawRepository interface {
+	FindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error)
 }
 
 type GetWithdrawalsUseCaseImpl struct {
-	transactRepo DBTransactionRepository
+	transactRepo DBWithdrawRepository
 }
 
-func NewGetWithdrawalsUseCase(transactRepo DBTransactionRepository) *GetWithdrawalsUseCaseImpl {
+func NewGetWithdrawalsUseCase(transactRepo DBWithdrawRepository) *GetWithdrawalsUseCaseImpl {
 	return &GetWithdrawalsUseCaseImpl{transactRepo: transactRepo}
 }
 
@@ -30,7 +30,7 @@ func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interfa
 		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
 	}
 
-	trans, err := uc.transactRepo.FindWithdrawalByUserID(ctx, currentUserID.String())
+	trans, err := uc.transactRepo.FindByUserID(ctx, currentUserID.String())
 	if err != nil {
 		log.Zap.Errorf("failed FindWithdrawalByUserID", err)
 		return status.Wrap(err, status.Unknown)

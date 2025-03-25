@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -15,23 +16,31 @@ var (
 type BonusCalculation struct {
 	id            uuid.UUID
 	orderID       uuid.UUID
-	loyaltyStatus string
+	loyaltyStatus LoyaltyStatus
 	accrual       CurrencyUnit
 }
 
 // Создает новый расчет бонусов, если данные корректны.
-func NewBonusCalculation(id, orderID uuid.UUID, loyaltyStatus string, accrual int) (*BonusCalculation, error) {
-	if loyaltyStatus == "" {
-		return nil, ErrInvalidLoyaltyStatus
-	}
-	if accrual < 0 {
-		return nil, ErrInvalidAccrual
+func NewBonusCalculation(order Order) (*BonusCalculation, error) {
+	return &BonusCalculation{
+		id:            GenerateUniqueID(),
+		orderID:       order.GetID(),
+		loyaltyStatus: LoyaltyStatusRegistered,
+		accrual:       CurrencyUnit(0),
+	}, nil
+}
+
+// CreateBonusCalculationFromDB создает расчет бонусов из БД, игнорирует валидацию.
+func CreateBonusCalculationFromDB(id, orderID uuid.UUID, loyaltyStatus string, accrual int) (*BonusCalculation, error) {
+	status, err := ParseLoyaltyStatus(loyaltyStatus)
+	if err != nil {
+		return nil, fmt.Errorf("failed ParseOrderStatus: %w", err)
 	}
 
 	return &BonusCalculation{
 		id:            id,
 		orderID:       orderID,
-		loyaltyStatus: loyaltyStatus,
+		loyaltyStatus: status,
 		accrual:       CurrencyUnit(accrual),
 	}, nil
 }
@@ -45,27 +54,10 @@ func (bc *BonusCalculation) GetOrderID() uuid.UUID {
 	return bc.orderID
 }
 
-func (bc *BonusCalculation) GetLoyaltyStatus() string {
+func (bc *BonusCalculation) GetLoyaltyStatus() LoyaltyStatus {
 	return bc.loyaltyStatus
 }
 
 func (bc *BonusCalculation) GetAccrual() CurrencyUnit {
 	return bc.accrual
-}
-
-// Setters
-func (bc *BonusCalculation) SetLoyaltyStatus(loyaltyStatus string) error {
-	if loyaltyStatus == "" {
-		return ErrInvalidLoyaltyStatus
-	}
-	bc.loyaltyStatus = loyaltyStatus
-	return nil
-}
-
-func (bc *BonusCalculation) SetAccrual(accrual CurrencyUnit) error {
-	if accrual < 0 {
-		return ErrInvalidAccrual
-	}
-	bc.accrual = accrual
-	return nil
 }

@@ -22,9 +22,9 @@ type OrderRepository interface {
 
 // BonusCalculationRepository определяет методы для работы с таблицей bonus_calculations.
 type BonusCalculationRepository interface {
-	Create(ctx context.Context, bonusCalculation BonusCalculation) (string, error)
-	FindByID(ctx context.Context, id string) (*BonusCalculation, error)
+	Create(ctx context.Context, bonusCalculation *BonusCalculation) error
 	FindByOrderID(ctx context.Context, orderID string) (*BonusCalculation, error)
+	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }
 
 // WithdrawRepository определяет методы для работы с таблицей transactions.

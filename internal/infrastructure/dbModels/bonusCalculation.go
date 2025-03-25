@@ -25,7 +25,7 @@ func (dbc *BonusCalculation) ToDomain() (*domain.BonusCalculation, error) {
 		return nil, err
 	}
 
-	return domain.NewBonusCalculation(
+	return domain.CreateBonusCalculationFromDB(
 		id,
 		orderID,
 		dbc.LoyaltyStatus,
@@ -38,7 +38,7 @@ func DBBonusCalculationFromDomain(bc *domain.BonusCalculation) *BonusCalculation
 	return &BonusCalculation{
 		ID:            bc.GetID().String(),
 		OrderID:       bc.GetOrderID().String(),
-		LoyaltyStatus: bc.GetLoyaltyStatus(),
+		LoyaltyStatus: bc.GetLoyaltyStatus().String(),
 		Accrual:       int(bc.GetAccrual()),
 	}
 }
