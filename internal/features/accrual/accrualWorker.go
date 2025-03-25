@@ -9,6 +9,7 @@ import (
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/features/services"
+	"github.com/VladSnap/gopherLoyalty/internal/helpers"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 )
 
@@ -32,10 +33,11 @@ func NewAccrualWorker(orderRepo domain.OrderRepository,
 	pollingInterval time.Duration,
 ) *AccrualWorkerImpl {
 	return &AccrualWorkerImpl{
-		orderRepo:       orderRepo,
-		bonusCalcsRepo:  bonusCalcsRepo,
-		apiClient:       apiClient,
-		pollingInterval: pollingInterval,
+		orderRepo:        orderRepo,
+		bonusCalcsRepo:   bonusCalcsRepo,
+		bonusAccountServ: bonusAccountServ,
+		apiClient:        apiClient,
+		pollingInterval:  pollingInterval,
 	}
 }
 
@@ -165,8 +167,8 @@ func (s *AccrualWorkerImpl) handleRegisteredStatus(ctx context.Context, order *d
 
 func (s *AccrualWorkerImpl) handleProcessingStatus(ctx context.Context, order *domain.Order,
 	accrualResp *AccrualResult) error {
-	if order.GetStatus() == domain.OrderStatusProcessed {
-		log.Zap.Info("order %s still being processed", order.GetNumber())
+	if order.GetStatus() == domain.OrderStatusProcessing {
+		log.Zap.Infof("order %s still being processed", order.GetNumber())
 		return nil
 	}
 
@@ -205,7 +207,8 @@ func (s *AccrualWorkerImpl) handleProcessedStatus(ctx context.Context, order *do
 		return fmt.Errorf("failed GetBonusAccount: %w", err)
 	}
 
-	bonusCalc, err := account.AddBonusCalc(order, domain.CurrencyFromMajorUnit(*accrualResp.orderInfo.Accrual))
+	accrual := domain.CurrencyFromMajorUnit(helpers.GetOrDefaultFloat64(accrualResp.orderInfo.Accrual, 0))
+	bonusCalc, err := account.AddBonusCalc(order, accrual)
 	if err != nil {
 		return fmt.Errorf("failed AddBonusCalc: %w", err)
 	}
