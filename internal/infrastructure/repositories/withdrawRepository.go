@@ -55,7 +55,7 @@ func (r *WithdrawImplRepository) FindByUserID(ctx context.Context, userID string
 
 func (r *WithdrawImplRepository) CalcTotal(ctx context.Context, userID string) (domain.CurrencyUnit, error) {
 	var total int
-	query := `SELECT SUM(*) AS total
+	query := `SELECT SUM(amount) AS total
         FROM withdraws
         WHERE user_id = $1`
 	err := r.db.GetContext(ctx, &total, query, userID)
