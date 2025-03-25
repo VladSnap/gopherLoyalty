@@ -27,9 +27,9 @@ type BonusCalculationRepository interface {
 	FindByOrderID(ctx context.Context, orderID string) (*BonusCalculation, error)
 }
 
-// TransactionRepository определяет методы для работы с таблицей transactions.
-type TransactionRepository interface {
-	Create(ctx context.Context, transaction *Transaction) error
-	FindByID(ctx context.Context, id string) (*Transaction, error)
-	CalcBalance(ctx context.Context, userID string) (CurrencyUnit, error)
+// WithdrawRepository определяет методы для работы с таблицей transactions.
+type WithdrawRepository interface {
+	Create(ctx context.Context, transaction *Withdraw) error
+	FindByID(ctx context.Context, id string) (*Withdraw, error)
+	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }

@@ -20,10 +20,10 @@ CREATE TABLE bonus_calculations (
     accrual INTEGER NOT NULL
 );
 
-CREATE TABLE transactions (
+CREATE TABLE withdraws (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    type TEXT NOT NULL CHECK (type IN ('WITHDRAW', 'ACCRUAL')),
-    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-    amount INTEGER NOT NULL DEFAULT 0
+    order_number TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount INTEGER NOT NULL
 );
