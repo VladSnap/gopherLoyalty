@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
@@ -122,8 +123,13 @@ func (s *AccrualWorkerImpl) processOrder(ctx context.Context, order *domain.Orde
 		return fmt.Errorf("failed parsing accrual order status: %w", err)
 	}
 
-	log.Zap.Errorf("process order %s: accrualStatus=%s, accrual=%.2f",
-		order.GetNumber(), status, accrualResp.orderInfo.Accrual)
+	accrual := "nil"
+	if accrualResp.orderInfo != nil && accrualResp.orderInfo.Accrual != nil {
+		accrual = strconv.FormatFloat(*accrualResp.orderInfo.Accrual, 'f', -1, 64)
+	}
+
+	log.Zap.Errorf("process order %s: accrualStatus=%s, accrual=%s",
+		order.GetNumber(), status, accrual)
 
 	switch status {
 	case domain.LoyaltyStatusRegistered:
