@@ -46,7 +46,7 @@ func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID s
 	query := `SELECT SUM(b.accrual) AS total
         FROM bonus_calculations b
         JOIN orders o ON b.order_id = o.id
-        WHERE o.user_id = $1 and loyalty_status = ''`
+        WHERE o.user_id = $1 and loyalty_status = 'PROCESSED'`
 	err := r.db.GetContext(ctx, &total, query, userID)
 	if err != nil {
 		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed to calc total")

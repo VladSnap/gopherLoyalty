@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/application/config"
+	"github.com/VladSnap/gopherLoyalty/internal/domain/domainServices"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getBalance"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getOrders"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getWithdrawals"
@@ -28,9 +29,11 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	userRepo := repositories.NewUserImplRepository(database)
 	orderRepo := repositories.NewOrderImplRepository(database)
-	transRepo := repositories.NewTransactionImplRepository(database)
+	withdrRepo := repositories.NewWithdrawImplRepository(database)
+	bonusRepo := repositories.NewBonusCalculationImplRepository(database)
 	passService := services.NewPasswordServiceImpl()
 	jwtService := services.NewJWTTokenService()
+	bonusAccounService := domainServices.NewBonusAccountServiceImpl(withdrRepo, bonusRepo)
 
 	regCmd := registrationUser.NewRegistrationUserCmdHandler(userRepo, passService)
 	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd, jwtService)
@@ -43,7 +46,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)
 
-	getBalanceUseCase := getBalance.NewGetBalanceUseCase(transRepo)
+	getBalanceUseCase := getBalance.NewGetBalanceUseCase(bonusAccounService)
 
 	withdrawBalanceCmd := withdrawBalance.NewWithdrawBalanceCmdHandler(userRepo, orderRepo, withdrRepo)
 	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase(withdrawBalanceCmd)
