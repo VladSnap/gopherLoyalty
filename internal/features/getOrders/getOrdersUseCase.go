@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
@@ -44,7 +45,13 @@ func (uc *GetOrdersUseCaseImpl) Execute(ctx context.Context, input *interface{},
 				Number:     ord.Number,
 				Status:     ord.Status,
 				UploadedAt: ord.UploadedAt,
-				Accrual:    ord.Accrual,
+				Accrual: func() *float64 {
+					if ord.Accrual == nil {
+						return nil
+					}
+					acc := domain.CurrencyUnit(*ord.Accrual).ToMajorUnit()
+					return &acc
+				}(),
 			})
 		}
 	}

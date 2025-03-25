@@ -22,7 +22,7 @@ type Order struct {
 type OrderGetDTO struct {
 	Number     string    `db:"number"`
 	UploadedAt time.Time `db:"uploaded_at"`
-	Accrual    *float64  `db:"accrual"`
+	Accrual    *int      `db:"accrual"`
 	Status     string    `db:"status"`
 }
 
@@ -75,7 +75,7 @@ func DBOrderFromDomain(order *domain.Order) *Order {
 	}
 }
 
-func (dbo *Order) ToGetDTO(accrual *float64) *OrderGetDTO {
+func (dbo *Order) ToGetDTO(accrual *int) *OrderGetDTO {
 	return &OrderGetDTO{
 		Number:     dbo.Number,
 		UploadedAt: dbo.UploadedAt,
