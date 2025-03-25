@@ -82,7 +82,11 @@ func (s *AccrualWorkerImpl) processOrders(ctx context.Context) {
 			continue
 		}
 
-		s.processOrder(ctx, &order, accrualResp)
+		err = s.processOrder(ctx, &order, accrualResp)
+		if err != nil {
+			log.Zap.Errorf("failed processOrder %s: %w", order.GetNumber(), err)
+			continue
+		}
 	}
 }
 
@@ -119,7 +123,7 @@ func (s *AccrualWorkerImpl) processOrder(ctx context.Context, order *domain.Orde
 	}
 
 	log.Zap.Errorf("process order %s: accrualStatus=%s, accrual=%.2f",
-		order.GetNumber(), status, *accrualResp.orderInfo.Accrual)
+		order.GetNumber(), status, accrualResp.orderInfo.Accrual)
 
 	switch status {
 	case domain.LoyaltyStatusRegistered:
