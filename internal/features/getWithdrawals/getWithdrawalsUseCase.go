@@ -17,11 +17,11 @@ type DBWithdrawRepository interface {
 }
 
 type GetWithdrawalsUseCaseImpl struct {
-	transactRepo DBWithdrawRepository
+	withdrawRepo DBWithdrawRepository
 }
 
-func NewGetWithdrawalsUseCase(transactRepo DBWithdrawRepository) *GetWithdrawalsUseCaseImpl {
-	return &GetWithdrawalsUseCaseImpl{transactRepo: transactRepo}
+func NewGetWithdrawalsUseCase(withdrawRepo DBWithdrawRepository) *GetWithdrawalsUseCaseImpl {
+	return &GetWithdrawalsUseCaseImpl{withdrawRepo: withdrawRepo}
 }
 
 func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interface{}, output *WithdrawalListResponse) error {
@@ -30,14 +30,14 @@ func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interfa
 		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
 	}
 
-	trans, err := uc.transactRepo.FindByUserID(ctx, currentUserID.String())
+	withdrawals, err := uc.withdrawRepo.FindByUserID(ctx, currentUserID.String())
 	if err != nil {
-		log.Zap.Errorf("failed FindWithdrawalByUserID", err)
+		log.Zap.Errorf("failed FindByUserID", err)
 		return status.Wrap(err, status.Unknown)
 	}
 
-	if len(trans) != 0 {
-		for _, tr := range trans {
+	if len(withdrawals) != 0 {
+		for _, tr := range withdrawals {
 			*output = append(*output, WithdrawalResponse{
 				Order:       tr.OrderNumber,
 				Sum:         domain.CurrencyUnit(tr.Amount).ToMajorUnit(),

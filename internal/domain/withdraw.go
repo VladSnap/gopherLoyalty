@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ErrInvalidTransactionAmount = errors.New("invalid transaction amount")
-	ErrInsufficientBalance      = errors.New("insufficient balance") // Это по идее надо в доменную модель счёта положить
+	ErrInvalidWithdrawAmount = errors.New("invalid withdraw amount")
+	ErrInsufficientBalance   = errors.New("insufficient balance") // Это по идее надо в доменную модель счёта положить
 )
 
 // Представляет доменную модель транзакции лояльности.
@@ -31,7 +31,7 @@ func NewWithdraw(
 		return nil, ErrInvalidOrderNumber
 	}
 	if amount < 0 {
-		return nil, ErrInvalidTransactionAmount
+		return nil, ErrInvalidWithdrawAmount
 	}
 
 	return &Withdraw{
@@ -43,8 +43,8 @@ func NewWithdraw(
 	}, nil
 }
 
-// CreateTransactionFromDB создает транзацию из БД, игнорирует валидацию.
-func CreateTransactionFromDB(
+// CreateWithdrawFromDB создает транзацию из БД, игнорирует валидацию.
+func CreateWithdrawFromDB(
 	id uuid.UUID,
 	createdAt time.Time,
 	orderNumber string,

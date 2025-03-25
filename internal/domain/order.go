@@ -26,7 +26,6 @@ type Order struct {
 	userID             uuid.UUID
 	bonusCalculationID *uuid.UUID // Опциональное поле
 	status             OrderStatus
-	//transactions       []Transaction // Список всех транзакций заказа
 }
 
 // NewOrder создает новый заказ, если данные корректны.

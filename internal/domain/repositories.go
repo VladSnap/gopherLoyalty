@@ -27,9 +27,9 @@ type BonusCalculationRepository interface {
 	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }
 
-// WithdrawRepository определяет методы для работы с таблицей transactions.
+// WithdrawRepository определяет методы для работы с таблицей withdraws.
 type WithdrawRepository interface {
-	Create(ctx context.Context, transaction *Withdraw) error
+	Create(ctx context.Context, withdraw *Withdraw) error
 	FindByID(ctx context.Context, id string) (*Withdraw, error)
 	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }

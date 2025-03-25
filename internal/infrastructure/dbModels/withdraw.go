@@ -16,14 +16,14 @@ type Withdraw struct {
 	Amount      int       `db:"amount"`       // int
 }
 
-// Преобразует DBTransaction в доменную модель Transaction.
+// Преобразует DBWithdraw в доменную модель Withdraw.
 func (w *Withdraw) ToDomain() (*domain.Withdraw, error) {
 	id, err := uuid.Parse(w.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return domain.CreateTransactionFromDB(
+	return domain.CreateWithdrawFromDB(
 		id,
 		w.CreatedAt,
 		w.OrderNumber,
@@ -31,7 +31,7 @@ func (w *Withdraw) ToDomain() (*domain.Withdraw, error) {
 	)
 }
 
-// Преобразует доменную модель Transaction в DBTransaction.
+// Преобразует доменную модель Withdraw в DBWithdraw.
 func DBWithdrawFromDomain(w *domain.Withdraw) *Withdraw {
 	return &Withdraw{
 		ID:          w.GetID().String(),

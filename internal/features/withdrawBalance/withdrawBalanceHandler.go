@@ -53,7 +53,7 @@ func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumb
 
 	newWithdraw, err := domain.NewWithdraw(order.GetNumber(), currentUser, withdraw)
 	if err != nil {
-		return fmt.Errorf("failed create new transaction: %w", err)
+		return fmt.Errorf("failed create new withdraw: %w", err)
 	}
 
 	err = cmd.transRepo.Create(ctx, newWithdraw)
