@@ -4,22 +4,18 @@ import (
 	"context"
 	"errors"
 
-	"github.com/VladSnap/gopherLoyalty/internal/domain"
+	"github.com/VladSnap/gopherLoyalty/internal/features/services"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/google/uuid"
 	"github.com/swaggest/usecase/status"
 )
 
-type BonusAccountService interface {
-	GetBonusAccountState(ctx context.Context, userID uuid.UUID) (*domain.BonusAccountState, error)
-}
-
 type GetBalanceUseCaseImpl struct {
-	bonusAccountServ BonusAccountService
+	bonusAccountServ services.BonusAccountService
 }
 
-func NewGetBalanceUseCase(bonusAccountServ BonusAccountService) *GetBalanceUseCaseImpl {
+func NewGetBalanceUseCase(bonusAccountServ services.BonusAccountService) *GetBalanceUseCaseImpl {
 	return &GetBalanceUseCaseImpl{bonusAccountServ: bonusAccountServ}
 }
 
