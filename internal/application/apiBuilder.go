@@ -18,15 +18,15 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/services"
 )
 
-func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager) (ApiServer, error) {
+func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager) (ApiServer, AccrualWorker, error) {
 	database, err := repositories.NewDatabaseLoyalty(config.DatabaseURI)
 	if err != nil {
-		return nil, fmt.Errorf("failed create DatabaseShortener: %w", err)
+		return nil, nil, fmt.Errorf("failed create DatabaseShortener: %w", err)
 	}
 	resMng.Register(database.Close)
 	err = database.InitDatabase()
 	if err != nil {
-		return nil, fmt.Errorf("failed init Database: %w", err)
+		return nil, nil, fmt.Errorf("failed init Database: %w", err)
 	}
 
 	userRepo := repositories.NewUserImplRepository(database)
@@ -70,5 +70,5 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 		accrualApiClient, 1*time.Second)
 	resMng.Register(accrualWorker.Close)
 
-	return server, nil
+	return server, accrualWorker, nil
 }

@@ -15,7 +15,7 @@ type AccrualSystemClient interface {
 	GetOrderDetails(orderNumber string) (*AccrualResult, error)
 }
 
-type AccrualWorker struct {
+type AccrualWorkerImpl struct {
 	orderRepo        domain.OrderRepository
 	bonusCalcsRepo   domain.BonusCalculationRepository
 	bonusAccountServ services.BonusAccountService
@@ -29,8 +29,8 @@ func NewAccrualWorker(orderRepo domain.OrderRepository,
 	bonusAccountServ services.BonusAccountService,
 	apiClient AccrualSystemClient,
 	pollingInterval time.Duration,
-) *AccrualWorker {
-	return &AccrualWorker{
+) *AccrualWorkerImpl {
+	return &AccrualWorkerImpl{
 		orderRepo:       orderRepo,
 		bonusCalcsRepo:  bonusCalcsRepo,
 		apiClient:       apiClient,
@@ -38,7 +38,7 @@ func NewAccrualWorker(orderRepo domain.OrderRepository,
 	}
 }
 
-func (s *AccrualWorker) StartPolling(ctx context.Context) {
+func (s *AccrualWorkerImpl) StartPolling(ctx context.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	s.ctxCancel = cancel
 
@@ -58,12 +58,12 @@ func (s *AccrualWorker) StartPolling(ctx context.Context) {
 	}()
 }
 
-func (s *AccrualWorker) Close() error {
+func (s *AccrualWorkerImpl) Close() error {
 	s.ctxCancel()
 	return nil
 }
 
-func (s *AccrualWorker) processOrders(ctx context.Context) {
+func (s *AccrualWorkerImpl) processOrders(ctx context.Context) {
 	orders, err := s.orderRepo.FindNotProcessed(ctx)
 	if err != nil {
 		log.Zap.Errorf("failed to get orders: %v", err)
@@ -86,7 +86,7 @@ func (s *AccrualWorker) processOrders(ctx context.Context) {
 	}
 }
 
-func (s *AccrualWorker) getOrderInfoAccrual(ctx context.Context, orderNumber string) (*AccrualResult, error) {
+func (s *AccrualWorkerImpl) getOrderInfoAccrual(ctx context.Context, orderNumber string) (*AccrualResult, error) {
 	const retryLimit int = 10
 	retryAttempts := 0
 	for {
@@ -108,7 +108,7 @@ func (s *AccrualWorker) getOrderInfoAccrual(ctx context.Context, orderNumber str
 	}
 }
 
-func (s *AccrualWorker) processOrder(ctx context.Context, order *domain.Order, accrualResp *AccrualResult) error {
+func (s *AccrualWorkerImpl) processOrder(ctx context.Context, order *domain.Order, accrualResp *AccrualResult) error {
 	if accrualResp.isNotRegisteredOrder {
 		return errors.New("failed process order for the reason: accrual order NotRegistered")
 	}
@@ -139,7 +139,7 @@ func (s *AccrualWorker) processOrder(ctx context.Context, order *domain.Order, a
 	return nil
 }
 
-func (s *AccrualWorker) handleRegisteredStatus(ctx context.Context, order *domain.Order) error {
+func (s *AccrualWorkerImpl) handleRegisteredStatus(ctx context.Context, order *domain.Order) error {
 	err := order.MarkProcessing()
 	if err != nil {
 		return fmt.Errorf("failed order update status: %w", err)
@@ -153,7 +153,7 @@ func (s *AccrualWorker) handleRegisteredStatus(ctx context.Context, order *domai
 	return nil
 }
 
-func (s *AccrualWorker) handleProcessingStatus(ctx context.Context, order *domain.Order,
+func (s *AccrualWorkerImpl) handleProcessingStatus(ctx context.Context, order *domain.Order,
 	accrualResp *AccrualResult) error {
 	if order.GetStatus() == domain.OrderStatusProcessed {
 		log.Zap.Info("order %s still being processed", order.GetNumber())
@@ -173,7 +173,7 @@ func (s *AccrualWorker) handleProcessingStatus(ctx context.Context, order *domai
 	return nil
 }
 
-func (s *AccrualWorker) handleInvalidStatus(ctx context.Context, order *domain.Order,
+func (s *AccrualWorkerImpl) handleInvalidStatus(ctx context.Context, order *domain.Order,
 	accrualResp *AccrualResult) error {
 	err := order.MarkInvalid()
 	if err != nil {
@@ -188,7 +188,7 @@ func (s *AccrualWorker) handleInvalidStatus(ctx context.Context, order *domain.O
 	return nil
 }
 
-func (s *AccrualWorker) handleProcessedStatus(ctx context.Context, order *domain.Order,
+func (s *AccrualWorkerImpl) handleProcessedStatus(ctx context.Context, order *domain.Order,
 	accrualResp *AccrualResult) error {
 	account, err := s.bonusAccountServ.GetBonusAccount(ctx, order.GetUserID())
 	if err != nil {
@@ -218,7 +218,7 @@ func (s *AccrualWorker) handleProcessedStatus(ctx context.Context, order *domain
 	return nil
 }
 
-func (s *AccrualWorker) updateOrder(ctx context.Context, order *domain.Order) error {
+func (s *AccrualWorkerImpl) updateOrder(ctx context.Context, order *domain.Order) error {
 	err := s.orderRepo.Update(ctx, order)
 	if err != nil {
 		return err

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -32,10 +33,12 @@ func Run() {
 		panic(err)
 	}
 
-	apiServer, err := CreateApiServer(conf, resourceManager)
+	apiServer, accrualWorker, err := CreateApiServer(conf, resourceManager)
 	if err != nil {
 		panic(err)
 	}
+
+	accrualWorker.StartPolling(context.Background())
 
 	err = apiServer.Start()
 

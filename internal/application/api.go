@@ -28,6 +28,10 @@ type ApiServer interface {
 	Start() error
 }
 
+type AccrualWorker interface {
+	StartPolling(ctx context.Context)
+}
+
 type SwaggestApiServer struct {
 	config                *config.AppConfig
 	jwtService            services.JWTTokenService
