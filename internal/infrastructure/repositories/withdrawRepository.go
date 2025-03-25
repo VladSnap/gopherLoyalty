@@ -21,7 +21,8 @@ func NewWithdrawImplRepository(db *DatabaseLoyalty) *WithdrawImplRepository {
 
 func (r *WithdrawImplRepository) Create(ctx context.Context, withdraw *domain.Withdraw) error {
 	dbTran := dbModels.DBWithdrawFromDomain(withdraw)
-	query := `INSERT INTO withdraws (id, created_at, type, order_number, amount) VALUES (:id, :created_at, :type, :order_number, :amount)`
+	query := `INSERT INTO withdraws (id, created_at, order_number, user_id, amount) 
+	VALUES (:id, :created_at, :order_number, :user_id, :amount)`
 	_, err := r.db.NamedExecContext(ctx, query, dbTran)
 	if err != nil {
 		return errors.Wrap(ErrDatabase, "failed to create loyalty account withdraw")
