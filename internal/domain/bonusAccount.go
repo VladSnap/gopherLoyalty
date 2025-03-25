@@ -1,11 +1,13 @@
 package domain
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 )
 
 var (
-// ErrInvalidBalance       = errors.New("balance cannot be negative")
+	ErrInsufficientBalance = errors.New("insufficient balance")
 )
 
 // Представляет доменную модель счета лояльности.

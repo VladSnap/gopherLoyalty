@@ -9,7 +9,6 @@ import (
 
 var (
 	ErrInvalidWithdrawAmount = errors.New("invalid withdraw amount")
-	ErrInsufficientBalance   = errors.New("insufficient balance") // Это по идее надо в доменную модель счёта положить
 )
 
 // Представляет доменную модель транзакции лояльности.

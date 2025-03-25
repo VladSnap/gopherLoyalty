@@ -78,7 +78,10 @@ func (server *SwaggestApiServer) Start() error {
 		middleware.Recoverer,
 	)
 
-	server.registerRoutes(service)
+	err := server.registerRoutes(service)
+	if err != nil {
+		return fmt.Errorf("failed registerRoutes: %w", err)
+	}
 
 	serv := &http.Server{
 		Addr:    server.config.RunAddress,
@@ -105,7 +108,7 @@ func (server *SwaggestApiServer) Start() error {
 	service.Docs("/docs", swguiv5.NewWithConfig(swaggeConfig))
 
 	// Запускаем прослушивание запросов.
-	err := serv.ListenAndServe()
+	err = serv.ListenAndServe()
 	if err != nil {
 		return fmt.Errorf("failed server listen: %w", err)
 	}
