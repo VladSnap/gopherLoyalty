@@ -11,12 +11,12 @@ import (
 type WithdrawBalanceCmdHandlerImpl struct {
 	userRepo  domain.UserRepository
 	orderRepo domain.OrderRepository
-	transRepo domain.TransactionRepository
+	transRepo domain.WithdrawRepository
 }
 
 func NewWithdrawBalanceCmdHandler(userRepo domain.UserRepository,
 	orderRepo domain.OrderRepository,
-	transRepo domain.TransactionRepository) *WithdrawBalanceCmdHandlerImpl {
+	transRepo domain.WithdrawRepository) *WithdrawBalanceCmdHandlerImpl {
 	return &WithdrawBalanceCmdHandlerImpl{userRepo: userRepo, orderRepo: orderRepo, transRepo: transRepo}
 }
 
@@ -38,7 +38,7 @@ func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumb
 	}
 
 	// Проверяем что, на балансе достаточно баллов (эту логику ниже надо убрать в доменный слой)
-	balance, err := cmd.transRepo.CalcBalance(ctx, currentUser.String())
+	balance, err := cmd.transRepo.CalcTotal(ctx, currentUser.String())
 	if err != nil {
 		return fmt.Errorf("failed calc balance: %w", err)
 	}
@@ -51,12 +51,12 @@ func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumb
 	// Тут возможно надо будет проверить, не существует ли уже какая либо транзакция связанная с заказом
 	// Не понятны требования к системе
 
-	newTran, err := domain.NewTransaction(domain.TransactionTypeWithdraw, order.GetID(), withdraw)
+	newWithdraw, err := domain.NewWithdraw(order.GetNumber(), currentUser, withdraw)
 	if err != nil {
 		return fmt.Errorf("failed create new transaction: %w", err)
 	}
 
-	err = cmd.transRepo.Create(ctx, newTran)
+	err = cmd.transRepo.Create(ctx, newWithdraw)
 	if err != nil {
 		return fmt.Errorf("failed save new order in DB: %w", err)
 	}
