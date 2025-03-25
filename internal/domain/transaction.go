@@ -8,36 +8,63 @@ import (
 )
 
 var (
-	ErrInvalidTransactionType = errors.New("invalid transaction type")
+	ErrInvalidTransactionType   = errors.New("invalid transaction type")
+	ErrInvalidTransactionAmount = errors.New("invalid transaction amount")
+	ErrInsufficientBalance      = errors.New("insufficient balance") // Это по идее надо в доменную модель счёта положить
 )
 
 // Представляет доменную модель транзакции лояльности.
 type Transaction struct {
-	id               uuid.UUID
-	createdAt        time.Time
-	transactionType  string
-	orderID          uuid.UUID
-	amount           CurrencyUnit
+	id              uuid.UUID
+	createdAt       time.Time
+	transactionType TransactionType
+	orderID         uuid.UUID
+	amount          CurrencyUnit
 }
 
 // Создает новую транзакцию, если данные корректны.
 func NewTransaction(
+	transactionType TransactionType,
+	orderID uuid.UUID,
+	amount CurrencyUnit,
+) (*Transaction, error) {
+	if transactionType != TransactionTypeWithdraw &&
+		transactionType != TransactionTypeAccrual {
+		return nil, ErrInvalidTransactionType
+	}
+
+	if amount < 0 {
+		return nil, ErrInvalidTransactionAmount
+	}
+
+	return &Transaction{
+		id:              GenerateUniqueID(),
+		createdAt:       time.Now().UTC(),
+		transactionType: transactionType,
+		orderID:         orderID,
+		amount:          amount,
+	}, nil
+}
+
+// CreateTransactionFromDB создает транзацию из БД, игнорирует валидацию.
+func CreateTransactionFromDB(
 	id uuid.UUID,
 	createdAt time.Time,
 	transactionType string,
 	orderID uuid.UUID,
-	amount CurrencyUnit,
+	amount int,
 ) (*Transaction, error) {
-	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
+	trType, err := ParseTransactionType(transactionType)
+	if err != nil {
 		return nil, ErrInvalidTransactionType
 	}
 
 	return &Transaction{
-		id:               id,
-		createdAt:        createdAt,
-		transactionType:  transactionType,
-		orderID:          orderID,
-		amount:           amount,
+		id:              id,
+		createdAt:       createdAt,
+		transactionType: trType,
+		orderID:         orderID,
+		amount:          CurrencyUnit(amount),
 	}, nil
 }
 
@@ -50,7 +77,7 @@ func (lat *Transaction) GetCreatedAt() time.Time {
 	return lat.createdAt
 }
 
-func (lat *Transaction) GetTransactionType() string {
+func (lat *Transaction) GetTransactionType() TransactionType {
 	return lat.transactionType
 }
 
@@ -60,21 +87,4 @@ func (lat *Transaction) GetOrderID() uuid.UUID {
 
 func (lat *Transaction) GetAmount() CurrencyUnit {
 	return lat.amount
-}
-
-// Setters
-func (lat *Transaction) SetTransactionType(transactionType string) error {
-	if transactionType != "WITHDRAW" && transactionType != "ACCRUAL" {
-		return ErrInvalidTransactionType
-	}
-	lat.transactionType = transactionType
-	return nil
-}
-
-func (lat *Transaction) SetOrderID(orderID uuid.UUID) {
-	lat.orderID = orderID
-}
-
-func (lat *Transaction) SetAmount(amount CurrencyUnit) {
-	lat.amount = amount
 }

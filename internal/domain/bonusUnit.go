@@ -2,10 +2,10 @@ package domain
 
 type CurrencyUnit int
 
-func (m CurrencyUnit) ToMajorUnit() float32 {
-	return float32(m) / 100
+func (m CurrencyUnit) ToMajorUnit() float64 {
+	return float64(m) / 100
 }
 
-func CurrencyFromMajorUnit(amount float32) CurrencyUnit {
+func CurrencyFromMajorUnit(amount float64) CurrencyUnit {
 	return CurrencyUnit(amount * 100)
 }

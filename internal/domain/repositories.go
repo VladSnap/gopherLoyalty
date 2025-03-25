@@ -29,6 +29,7 @@ type BonusCalculationRepository interface {
 
 // TransactionRepository определяет методы для работы с таблицей transactions.
 type TransactionRepository interface {
-	Create(ctx context.Context, transaction Transaction) (string, error)
+	Create(ctx context.Context, transaction *Transaction) error
 	FindByID(ctx context.Context, id string) (*Transaction, error)
+	CalcBalance(ctx context.Context, userID string) (CurrencyUnit, error)
 }

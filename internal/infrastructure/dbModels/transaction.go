@@ -40,12 +40,12 @@ func (dlat *Transaction) ToDomain() (*domain.Transaction, error) {
 		return nil, err
 	}
 
-	return domain.NewTransaction(
+	return domain.CreateTransactionFromDB(
 		id,
 		dlat.CreatedAt,
 		dlat.TransactionType,
 		orderID,
-		domain.CurrencyUnit(dlat.Amount),
+		dlat.Amount,
 	)
 }
 
@@ -54,7 +54,8 @@ func DBTransactionFromDomain(lat *domain.Transaction) *Transaction {
 	return &Transaction{
 		ID:              lat.GetID().String(),
 		CreatedAt:       lat.GetCreatedAt(),
-		TransactionType: lat.GetTransactionType(),
+		TransactionType: lat.GetTransactionType().String(),
 		OrderID:         lat.GetOrderID().String(),
+		Amount:          int(lat.GetAmount()),
 	}
 }

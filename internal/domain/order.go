@@ -10,6 +10,8 @@ import (
 
 var (
 	ErrInvalidOrderNumber          = errors.New("order number is required")
+	ErrInvalidOrderNotFound        = errors.New("order number not found")
+	ErrNotAuthorizeAccessOrder     = errors.New("order not authorize access to order")
 	ErrInvalidUserID               = errors.New("user ID is required")
 	ErrInvalidStatus               = errors.New("status is required")
 	ErrAlreadyUploadedOrderCurrent = errors.New("order already uploaded by current user")
@@ -24,6 +26,7 @@ type Order struct {
 	userID             uuid.UUID
 	bonusCalculationID *uuid.UUID // Опциональное поле
 	status             OrderStatus
+	//transactions       []Transaction // Список всех транзакций заказа
 }
 
 // NewOrder создает новый заказ, если данные корректны.
@@ -46,6 +49,7 @@ func NewOrder(number string, uploadedAt time.Time,
 	}, nil
 }
 
+// CreateOrderFromDB создает заказ из БД, игнорирует валидацию.
 func CreateOrderFromDB(id uuid.UUID, number string, uploadedAt time.Time,
 	userID uuid.UUID, status string, bonusCalculationID *uuid.UUID) (*Order, error) {
 	oStatus, err := ParseOrderStatus(status)
