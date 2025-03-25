@@ -24,7 +24,7 @@ import (
 	"github.com/swaggest/usecase"
 )
 
-type ApiServer interface {
+type APIServer interface {
 	Start() error
 }
 
@@ -32,7 +32,7 @@ type AccrualWorker interface {
 	StartPolling()
 }
 
-type SwaggestApiServer struct {
+type SwaggestAPIServer struct {
 	config                *config.AppConfig
 	jwtService            services.JWTTokenService
 	registerUseCase       RegistrationUserUseCase
@@ -44,7 +44,7 @@ type SwaggestApiServer struct {
 	wthdrawBalanceUseCase WithdrawBalanceUseCase
 }
 
-func NewApiServer(config *config.AppConfig,
+func NewAPIServer(config *config.AppConfig,
 	jwtService services.JWTTokenService,
 	registerUseCase RegistrationUserUseCase,
 	loginUseCase LoginUserUseCase,
@@ -52,8 +52,8 @@ func NewApiServer(config *config.AppConfig,
 	getOrdersUseCase GetOrdersUseCase,
 	getBalanceUseCase GetBalanceUseCase,
 	wthdrawBalanceUseCase WithdrawBalanceUseCase,
-	getWithdrawalsUseCase GetWithdrawalsUseCase) *SwaggestApiServer {
-	server := new(SwaggestApiServer)
+	getWithdrawalsUseCase GetWithdrawalsUseCase) *SwaggestAPIServer {
+	server := new(SwaggestAPIServer)
 	server.config = config
 	server.jwtService = jwtService
 	server.registerUseCase = registerUseCase
@@ -66,7 +66,7 @@ func NewApiServer(config *config.AppConfig,
 	return server
 }
 
-func (server *SwaggestApiServer) Start() error {
+func (server *SwaggestAPIServer) Start() error {
 	reflector := openapi31.NewReflector()
 	service := web.NewService(reflector)
 
@@ -119,7 +119,7 @@ func (server *SwaggestApiServer) Start() error {
 	return nil
 }
 
-func (server *SwaggestApiServer) registerRoutes(service *web.Service) error {
+func (server *SwaggestAPIServer) registerRoutes(service *web.Service) error {
 	// Подготовка и настройка Interactor для корректной работы swagger
 	registerInter := usecase.NewInteractor(server.registerUseCase.Execute)
 	registerInter.SetTitle("Регистрация пользователя.")

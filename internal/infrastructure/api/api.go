@@ -4,25 +4,25 @@ type EmptyBody struct{}
 
 type KeyContext string
 
-type HttpStatusResponse struct {
+type HTTPStatusResponse struct {
 	httpStatus          int
-	excpectedHttpStatus []int
+	expectedHTTPStatus []int
 }
 
-func (r *HttpStatusResponse) WithHttpStatus(httpStatus int) *HttpStatusResponse {
+func (r *HTTPStatusResponse) WithHttpStatus(httpStatus int) *HTTPStatusResponse {
 	r.httpStatus = httpStatus
 	return r
 }
 
-func (r *HttpStatusResponse) WithExcpectedHttpStatus(excpectedHttpStatus []int) *HttpStatusResponse {
-	r.excpectedHttpStatus = excpectedHttpStatus
+func (r *HTTPStatusResponse) WithExcpectedHttpStatus(expectedHttpStatus []int) *HTTPStatusResponse {
+	r.expectedHTTPStatus = expectedHttpStatus
 	return r
 }
 
-func (r *HttpStatusResponse) HTTPStatus() int {
+func (r *HTTPStatusResponse) HTTPStatus() int {
 	return r.httpStatus
 }
 
-func (r *HttpStatusResponse) ExpectedHTTPStatuses() []int {
-	return r.excpectedHttpStatus
+func (r *HTTPStatusResponse) ExpectedHTTPStatuses() []int {
+	return r.expectedHTTPStatus
 }

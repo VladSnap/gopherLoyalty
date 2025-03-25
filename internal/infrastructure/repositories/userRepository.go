@@ -19,7 +19,7 @@ func NewUserImplRepository(db *DatabaseLoyalty) *UserImplRepository {
 }
 
 func (r *UserImplRepository) Create(ctx context.Context, user *domain.User) error {
-	dbUser := dbModels.DbUserFromDomain(user)
+	dbUser := dbModels.DBUserFromDomain(user)
 	query := `INSERT INTO users (id, login, password) VALUES (:id, :login, :password)`
 	_, err := r.db.NamedExecContext(ctx, query, dbUser)
 	if err != nil {

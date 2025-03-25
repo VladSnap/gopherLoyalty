@@ -32,7 +32,7 @@ func Run() {
 		panic(err)
 	}
 
-	apiServer, accrualWorker, err := CreateApiServer(conf, resourceManager)
+	apiServer, accrualWorker, err := CreateAPIServer(conf, resourceManager)
 	if err != nil {
 		panic(err)
 	}

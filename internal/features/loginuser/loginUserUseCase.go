@@ -1,4 +1,4 @@
-package loginUser
+package loginuser
 
 import (
 	"context"

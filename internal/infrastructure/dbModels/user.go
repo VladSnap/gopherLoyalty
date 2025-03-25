@@ -24,7 +24,7 @@ func (dbu *User) ToDomain() (*domain.User, error) {
 }
 
 // Преобразует доменную модель User в DBUser.
-func DbUserFromDomain(user *domain.User) *User {
+func DBUserFromDomain(user *domain.User) *User {
 	return &User{
 		ID:       user.GetID().String(),
 		Login:    user.GetLogin(),

@@ -1,4 +1,4 @@
-package withdrawBalance
+package withdrawbalance
 
 import (
 	"context"

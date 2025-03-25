@@ -1,4 +1,4 @@
-package uploadOrder
+package uploadorder
 
 import (
 	"context"

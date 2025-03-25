@@ -1,4 +1,4 @@
-package loginUser
+package loginuser
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
-	"github.com/VladSnap/gopherLoyalty/internal/domain/domainServices"
+	"github.com/VladSnap/gopherLoyalty/internal/domainservices"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/repositories"
 )
 
 type LoginUserCmdHandlerImpl struct {
 	repo        domain.UserRepository
-	passService domainServices.PasswordService
+	passService domainservices.PasswordService
 }
 
 func NewRegistrationUserCmdHandler(repo domain.UserRepository,
-	passService domainServices.PasswordService) *LoginUserCmdHandlerImpl {
+	passService domainservices.PasswordService) *LoginUserCmdHandlerImpl {
 	return &LoginUserCmdHandlerImpl{repo: repo, passService: passService}
 }
 

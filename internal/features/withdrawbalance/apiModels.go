@@ -1,4 +1,4 @@
-package withdrawBalance
+package withdrawbalance
 
 type WithdrawRequest struct {
 	Order string  `json:"order"`

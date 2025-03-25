@@ -1,4 +1,4 @@
-package uploadOrder
+package uploadorder
 
 import (
 	"context"
@@ -25,7 +25,7 @@ type UploadOrderCmdHandler interface {
 	Execute(ctx context.Context, orderNumber string, currentUser uuid.UUID) error
 }
 
-func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrderRequest, output *api.HttpStatusResponse) error {
+func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrderRequest, output *api.HTTPStatusResponse) error {
 	currentUserID, ok := ctx.Value(api.KeyContext("UserID")).(uuid.UUID)
 	if !ok {
 		err := errors.New("current userID is empty")

@@ -1,4 +1,4 @@
-package getWithdrawals
+package getwithdrawals
 
 import "time"
 

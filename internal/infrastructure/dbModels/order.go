@@ -33,7 +33,7 @@ func (dbo *Order) ToDomain() (*domain.Order, error) {
 		return nil, fmt.Errorf("failed ParseUniqueID for ID: %w", err)
 	}
 
-	userId, err := domain.ParseUniqueID(dbo.UserID)
+	userID, err := domain.ParseUniqueID(dbo.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed ParseUniqueID for UserID: %w", err)
 	}
@@ -51,7 +51,7 @@ func (dbo *Order) ToDomain() (*domain.Order, error) {
 		id,
 		dbo.Number,
 		dbo.UploadedAt,
-		userId,
+		userID,
 		dbo.Status,
 		bonusCalculationID,
 	)

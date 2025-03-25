@@ -1,4 +1,4 @@
-package domainServices
+package domainservices
 
 type PasswordService interface {
 	HashPassword(password string) (string, error)

@@ -1,10 +1,10 @@
-package loginUser
+package registrationuser
 
-type LoginUserRequest struct {
+type RegisterUserRequest struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
-type LoginUserResponse struct {
+type RegisterUserResponse struct {
 	Authorization string `header:"Authorization" json:"-"`
 }

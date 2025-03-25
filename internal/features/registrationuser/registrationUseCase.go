@@ -1,4 +1,4 @@
-package registrationUser
+package registrationuser
 
 import (
 	"context"

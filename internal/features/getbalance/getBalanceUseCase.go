@@ -1,4 +1,4 @@
-package getBalance
+package getbalance
 
 import (
 	"context"

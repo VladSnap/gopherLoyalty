@@ -5,20 +5,20 @@ import (
 	"time"
 
 	"github.com/VladSnap/gopherLoyalty/internal/application/config"
-	"github.com/VladSnap/gopherLoyalty/internal/domain/domainServices"
+	"github.com/VladSnap/gopherLoyalty/internal/domainservices"
 	"github.com/VladSnap/gopherLoyalty/internal/features/accrual"
-	"github.com/VladSnap/gopherLoyalty/internal/features/getBalance"
-	"github.com/VladSnap/gopherLoyalty/internal/features/getOrders"
-	"github.com/VladSnap/gopherLoyalty/internal/features/getWithdrawals"
-	"github.com/VladSnap/gopherLoyalty/internal/features/loginUser"
-	"github.com/VladSnap/gopherLoyalty/internal/features/registrationUser"
-	"github.com/VladSnap/gopherLoyalty/internal/features/uploadOrder"
-	"github.com/VladSnap/gopherLoyalty/internal/features/withdrawBalance"
+	"github.com/VladSnap/gopherLoyalty/internal/features/getbalance"
+	"github.com/VladSnap/gopherLoyalty/internal/features/getorders"
+	"github.com/VladSnap/gopherLoyalty/internal/features/getwithdrawals"
+	"github.com/VladSnap/gopherLoyalty/internal/features/loginuser"
+	"github.com/VladSnap/gopherLoyalty/internal/features/registrationuser"
+	"github.com/VladSnap/gopherLoyalty/internal/features/uploadorder"
+	"github.com/VladSnap/gopherLoyalty/internal/features/withdrawbalance"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/repositories"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/services"
 )
 
-func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager) (ApiServer, AccrualWorker, error) {
+func CreateAPIServer(config *config.AppConfig, resMng *services.ResourceManager) (APIServer, AccrualWorker, error) {
 	database, err := repositories.NewDatabaseLoyalty(config.DatabaseURI)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed create DatabaseLoyalty: %w", err)
@@ -35,27 +35,27 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	bonusRepo := repositories.NewBonusCalculationImplRepository(database)
 	passService := services.NewPasswordServiceImpl()
 	jwtService := services.NewJWTTokenService()
-	bonusAccounService := domainServices.NewBonusAccountServiceImpl(withdrRepo, bonusRepo)
+	bonusAccounService := domainservices.NewBonusAccountServiceImpl(withdrRepo, bonusRepo)
 
-	regCmd := registrationUser.NewRegistrationUserCmdHandler(userRepo, passService)
-	registerUseCase := registrationUser.NewRegistrationUserUseCase(regCmd, jwtService)
+	regCmd := registrationuser.NewRegistrationUserCmdHandler(userRepo, passService)
+	registerUseCase := registrationuser.NewRegistrationUserUseCase(regCmd, jwtService)
 
-	loginCmd := loginUser.NewRegistrationUserCmdHandler(userRepo, passService)
-	loginUseCase := loginUser.NewLoginUserUseCase(loginCmd, jwtService)
+	loginCmd := loginuser.NewRegistrationUserCmdHandler(userRepo, passService)
+	loginUseCase := loginuser.NewLoginUserUseCase(loginCmd, jwtService)
 
-	uploadOrderCmd := uploadOrder.NewUploadOrderCmdHandler(userRepo, orderRepo, bonusRepo)
-	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase(uploadOrderCmd)
+	uploadOrderCmd := uploadorder.NewUploadOrderCmdHandler(userRepo, orderRepo, bonusRepo)
+	uploadOrderUseCase := uploadorder.NewUploadOrderUseCase(uploadOrderCmd)
 
-	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)
+	getOrdersUseCase := getorders.NewGetOrdersUseCase(orderRepo)
 
-	getBalanceUseCase := getBalance.NewGetBalanceUseCase(bonusAccounService)
+	getBalanceUseCase := getbalance.NewGetBalanceUseCase(bonusAccounService)
 
-	withdrawBalanceCmd := withdrawBalance.NewWithdrawBalanceCmdHandler(userRepo, orderRepo, withdrRepo, bonusAccounService)
-	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase(withdrawBalanceCmd)
+	withdrawBalanceCmd := withdrawbalance.NewWithdrawBalanceCmdHandler(userRepo, orderRepo, withdrRepo, bonusAccounService)
+	withdrawBalanceUseCase := withdrawbalance.NewWithdrawBalanceUseCase(withdrawBalanceCmd)
 
-	getWithdrawalsUseCase := getWithdrawals.NewGetWithdrawalsUseCase(withdrRepo)
+	getWithdrawalsUseCase := getwithdrawals.NewGetWithdrawalsUseCase(withdrRepo)
 
-	server := NewApiServer(config,
+	server := NewAPIServer(config,
 		jwtService,
 		registerUseCase,
 		loginUseCase,
@@ -65,9 +65,9 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 		withdrawBalanceUseCase,
 		getWithdrawalsUseCase)
 
-	accrualApiClient := accrual.NewAccrualSystemClient(config.AccrualSystemAddress)
+	accrualAPIClient := accrual.NewAccrualSystemClient(config.AccrualSystemAddress)
 	accrualWorker := accrual.NewAccrualWorker(orderRepo, bonusRepo, bonusAccounService,
-		accrualApiClient, 1*time.Second)
+		accrualAPIClient, 1*time.Second)
 	resMng.Register(accrualWorker.Close)
 
 	return server, accrualWorker, nil
