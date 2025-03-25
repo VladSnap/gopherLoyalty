@@ -21,7 +21,7 @@ import (
 func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager) (ApiServer, AccrualWorker, error) {
 	database, err := repositories.NewDatabaseLoyalty(config.DatabaseURI)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed create DatabaseShortener: %w", err)
+		return nil, nil, fmt.Errorf("failed create DatabaseLoyalty: %w", err)
 	}
 	resMng.Register(database.Close)
 	err = database.InitDatabase()

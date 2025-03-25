@@ -24,7 +24,7 @@ func Run() {
 	// Регаем функцию Sync Zap логов
 	resourceManager.Register(log.Close)
 
-	log.Zap.Info("run shorneter server", zap.Strings("Args", os.Args))
+	log.Zap.Info("run gophermart api", zap.Strings("Args", os.Args))
 
 	confValidator := &config.OptionsValidator{}
 	conf, err := config.LoadConfig(confValidator)
