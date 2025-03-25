@@ -8,6 +8,7 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/helpers"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/google/uuid"
 	"github.com/swaggest/usecase/status"
 )
@@ -28,11 +29,16 @@ func NewGetBalanceUseCase(dbLoyaltyRepo DBTransactionRepository) *GetBalanceUseC
 func (uc *GetBalanceUseCaseImpl) Execute(ctx context.Context, input *interface{}, output *BalanceResponse) error {
 	currentUserID, ok := ctx.Value(api.KeyContext("UserID")).(uuid.UUID)
 	if !ok {
-		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
+		err := errors.New("current userID is empty")
+		log.Zap.Error(err)
+		return status.Wrap(err, status.Unknown)
+	}
+
 	}
 
 	calc, err := uc.dbLoyaltyRepo.CalcBalanceAndWithdraw(ctx, currentUserID.String())
 	if err != nil {
+		log.Zap.Error(err)
 		return status.Wrap(err, status.Unknown)
 	}
 

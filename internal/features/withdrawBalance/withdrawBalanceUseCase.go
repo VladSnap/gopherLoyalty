@@ -29,7 +29,9 @@ type WithdrawBalanceCmdHandler interface {
 func (uc *WithdrawBalanceUseCaseImpl) Execute(ctx context.Context, input *WithdrawRequest, output *api.EmptyBody) error {
 	currentUserID, ok := ctx.Value(api.KeyContext("UserID")).(uuid.UUID)
 	if !ok {
-		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
+		err := errors.New("current userID is empty")
+		log.Zap.Error(err)
+		return status.Wrap(err, status.Unknown)
 	}
 
 	err := uc.cmdHandler.Execute(ctx, input.Order, input.Sum, currentUserID)
