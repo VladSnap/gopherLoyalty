@@ -5,19 +5,24 @@ import (
 	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
+	"github.com/VladSnap/gopherLoyalty/internal/features/services"
 	"github.com/google/uuid"
 )
 
 type WithdrawBalanceCmdHandlerImpl struct {
-	userRepo  domain.UserRepository
-	orderRepo domain.OrderRepository
-	transRepo domain.WithdrawRepository
+	userRepo         domain.UserRepository
+	orderRepo        domain.OrderRepository
+	withdrawRepo     domain.WithdrawRepository
+	bonusAccountServ services.BonusAccountService
 }
 
 func NewWithdrawBalanceCmdHandler(userRepo domain.UserRepository,
 	orderRepo domain.OrderRepository,
-	transRepo domain.WithdrawRepository) *WithdrawBalanceCmdHandlerImpl {
-	return &WithdrawBalanceCmdHandlerImpl{userRepo: userRepo, orderRepo: orderRepo, transRepo: transRepo}
+	withdrawRepo domain.WithdrawRepository,
+	bonusAccountServ services.BonusAccountService,
+) *WithdrawBalanceCmdHandlerImpl {
+	return &WithdrawBalanceCmdHandlerImpl{userRepo: userRepo, orderRepo: orderRepo,
+		withdrawRepo: withdrawRepo, bonusAccountServ: bonusAccountServ}
 }
 
 func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumber string,
@@ -30,33 +35,24 @@ func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumb
 	if err != nil {
 		return fmt.Errorf("failed FindOrder OrderNumber=%s: %w", orderNumber, err)
 	}
-	// Если заказ есть в системе, то проверим, чтобы он относился к текущему юзеру
+	// Если заказ есть в системе, то проверим, чтобы он относился к текущему юзеру (не было в требовании)
 	if order != nil {
 		if order.GetUserID() != currentUser {
 			return domain.ErrNotAuthorizeAccessOrder
 		}
 	}
 
-	// Проверяем что, на балансе достаточно баллов (эту логику ниже надо убрать в доменный слой)
-	balance, err := cmd.transRepo.CalcTotal(ctx, currentUser.String())
+	bonusAccount, err := cmd.bonusAccountServ.GetBonusAccount(ctx, currentUser)
 	if err != nil {
-		return fmt.Errorf("failed calc balance: %w", err)
+		return fmt.Errorf("failed GetBonusAccount: %w", err)
 	}
 
-	withdraw := domain.CurrencyFromMajorUnit(withdrawSum)
-	if balance < withdraw {
-		return domain.ErrInsufficientBalance
-	}
-
-	// Тут возможно надо будет проверить, не существует ли уже какая либо транзакция связанная с заказом
-	// Не понятны требования к системе
-
-	newWithdraw, err := domain.NewWithdraw(order.GetNumber(), currentUser, withdraw)
+	newWithdraw, err := bonusAccount.AddWithdraw(orderNumber, domain.CurrencyFromMajorUnit(withdrawSum))
 	if err != nil {
-		return fmt.Errorf("failed create new withdraw: %w", err)
+		return fmt.Errorf("failed AddWithdraw: %w", err)
 	}
 
-	err = cmd.transRepo.Create(ctx, newWithdraw)
+	err = cmd.withdrawRepo.Create(ctx, newWithdraw)
 	if err != nil {
 		return fmt.Errorf("failed save new order in DB: %w", err)
 	}

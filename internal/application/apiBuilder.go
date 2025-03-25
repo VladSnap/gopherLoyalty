@@ -48,7 +48,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 
 	getBalanceUseCase := getBalance.NewGetBalanceUseCase(bonusAccounService)
 
-	withdrawBalanceCmd := withdrawBalance.NewWithdrawBalanceCmdHandler(userRepo, orderRepo, withdrRepo)
+	withdrawBalanceCmd := withdrawBalance.NewWithdrawBalanceCmdHandler(userRepo, orderRepo, withdrRepo, bonusAccounService)
 	withdrawBalanceUseCase := withdrawBalance.NewWithdrawBalanceUseCase(withdrawBalanceCmd)
 
 	getWithdrawalsUseCase := getWithdrawals.NewGetWithdrawalsUseCase(withdrRepo)

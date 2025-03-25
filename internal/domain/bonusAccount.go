@@ -37,6 +37,31 @@ func (ba *BonusAccount) GetState() (*BonusAccountState, error) {
 	return NewBonusAccountState(bonusCalcTotal-withdrawTotal, bonusCalcTotal, withdrawTotal)
 }
 
+func (ba *BonusAccount) GetWithdrawals() []Withdraw {
+	return ba.withdraws
+}
+
+func (ba *BonusAccount) AddWithdraw(orderNumber string, amount CurrencyUnit) (*Withdraw, error) {
+	withdraw, err := NewWithdraw(orderNumber, ba.userID, amount)
+	if err != nil {
+		return nil, err
+	}
+
+	state, err := ba.GetState()
+	if err != nil {
+		return nil, err
+	}
+	// Проверим достаточно ли средств на балансе
+	if state.balance < amount {
+		return nil, ErrInsufficientBalance
+	}
+
+	// Тут можно проверить, имеется ли списание для переданного номера заказа
+
+	ba.withdraws = append(ba.withdraws, *withdraw)
+	return withdraw, nil
+}
+
 func (ba *BonusAccount) getBonusCalcTotal() CurrencyUnit {
 	var total CurrencyUnit
 	for _, b := range ba.bonusCalcs {
