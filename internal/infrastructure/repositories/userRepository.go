@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
-	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbmodels"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -19,7 +19,7 @@ func NewUserImplRepository(db *DatabaseLoyalty) *UserImplRepository {
 }
 
 func (r *UserImplRepository) Create(ctx context.Context, user *domain.User) error {
-	dbUser := dbModels.DBUserFromDomain(user)
+	dbUser := dbmodels.DBUserFromDomain(user)
 	query := `INSERT INTO users (id, login, password) VALUES (:id, :login, :password)`
 	_, err := r.db.NamedExecContext(ctx, query, dbUser)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r *UserImplRepository) Create(ctx context.Context, user *domain.User) erro
 
 func (r *UserImplRepository) FindByID(ctx context.Context, id string) (*domain.User, error) {
 	query := `SELECT * FROM users WHERE id = $1`
-	var dbUser dbModels.User
+	var dbUser dbmodels.User
 	err := r.db.GetContext(ctx, &dbUser, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -43,7 +43,7 @@ func (r *UserImplRepository) FindByID(ctx context.Context, id string) (*domain.U
 
 func (r *UserImplRepository) FindByLogin(ctx context.Context, login string) (*domain.User, error) {
 	query := `SELECT * FROM users WHERE login = $1`
-	var dbUser dbModels.User
+	var dbUser dbmodels.User
 	err := r.db.GetContext(ctx, &dbUser, query, login)
 	if err != nil {
 		if err == sql.ErrNoRows {

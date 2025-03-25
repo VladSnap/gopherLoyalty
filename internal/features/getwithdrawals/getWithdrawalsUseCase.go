@@ -6,14 +6,14 @@ import (
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
-	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbmodels"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/google/uuid"
 	"github.com/swaggest/usecase/status"
 )
 
 type DBWithdrawRepository interface {
-	DBFindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error)
+	DBFindByUserID(ctx context.Context, userID string) ([]dbmodels.Withdraw, error)
 }
 
 type GetWithdrawalsUseCaseImpl struct {

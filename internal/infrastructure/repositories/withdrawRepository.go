@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
-	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbmodels"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -20,7 +20,7 @@ func NewWithdrawImplRepository(db *DatabaseLoyalty) *WithdrawImplRepository {
 }
 
 func (r *WithdrawImplRepository) Create(ctx context.Context, withdraw *domain.Withdraw) error {
-	dbTran := dbModels.DBWithdrawFromDomain(withdraw)
+	dbTran := dbmodels.DBWithdrawFromDomain(withdraw)
 	query := `INSERT INTO withdraws (id, created_at, order_number, user_id, amount) 
 	VALUES (:id, :created_at, :order_number, :user_id, :amount)`
 	_, err := r.db.NamedExecContext(ctx, query, dbTran)
@@ -32,7 +32,7 @@ func (r *WithdrawImplRepository) Create(ctx context.Context, withdraw *domain.Wi
 
 func (r *WithdrawImplRepository) FindByID(ctx context.Context, id string) (*domain.Withdraw, error) {
 	query := `SELECT * FROM withdraws WHERE id = $1`
-	var Withdraw dbModels.Withdraw
+	var Withdraw dbmodels.Withdraw
 	err := r.db.GetContext(ctx, &Withdraw, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -43,9 +43,9 @@ func (r *WithdrawImplRepository) FindByID(ctx context.Context, id string) (*doma
 	return Withdraw.ToDomain()
 }
 
-func (r *WithdrawImplRepository) DBFindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error) {
+func (r *WithdrawImplRepository) DBFindByUserID(ctx context.Context, userID string) ([]dbmodels.Withdraw, error) {
 	query := `SELECT * FROM withdraws WHERE user_id = $1`
-	var withdraws []dbModels.Withdraw
+	var withdraws []dbmodels.Withdraw
 	err := r.db.SelectContext(ctx, &withdraws, query, userID)
 	if err != nil {
 		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
@@ -55,7 +55,7 @@ func (r *WithdrawImplRepository) DBFindByUserID(ctx context.Context, userID stri
 
 func (r *WithdrawImplRepository) FindByUserID(ctx context.Context, userID string) ([]domain.Withdraw, error) {
 	query := `SELECT * FROM withdraws WHERE user_id = $1`
-	var withdraws []dbModels.Withdraw
+	var withdraws []dbmodels.Withdraw
 	err := r.db.SelectContext(ctx, &withdraws, query, userID)
 	if err != nil {
 		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
@@ -75,7 +75,7 @@ func (r *WithdrawImplRepository) CalcTotal(ctx context.Context, userID string) (
 	return domain.CurrencyUnit(total.Int32), nil
 }
 
-func convertToDomWithdraw(dbWs []dbModels.Withdraw) ([]domain.Withdraw, error) {
+func convertToDomWithdraw(dbWs []dbmodels.Withdraw) ([]domain.Withdraw, error) {
 	domWs := make([]domain.Withdraw, len(dbWs))
 	for _, d := range dbWs {
 		domW, err := d.ToDomain()

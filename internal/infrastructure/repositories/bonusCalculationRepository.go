@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
-	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbmodels"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -20,7 +20,7 @@ func NewBonusCalculationImplRepository(db *DatabaseLoyalty) *BonusCalculationImp
 }
 
 func (r *BonusCalculationImplRepository) Create(ctx context.Context, bonusCalculation *domain.BonusCalculation) error {
-	dbBonusCalc := dbModels.DBBonusCalculationFromDomain(bonusCalculation)
+	dbBonusCalc := dbmodels.DBBonusCalculationFromDomain(bonusCalculation)
 	query := `INSERT INTO bonus_calculations (id, order_id, accrual) VALUES (:id, :order_id, :accrual)`
 	_, err := r.db.NamedExecContext(ctx, query, dbBonusCalc)
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *BonusCalculationImplRepository) Create(ctx context.Context, bonusCalcul
 
 func (r *BonusCalculationImplRepository) FindByOrderID(ctx context.Context, orderID string) (*domain.BonusCalculation, error) {
 	query := `SELECT * FROM bonus_calculations WHERE order_id = $1`
-	var bonusCalculation dbModels.BonusCalculation
+	var bonusCalculation dbmodels.BonusCalculation
 	err := r.db.GetContext(ctx, &bonusCalculation, query, orderID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -47,7 +47,7 @@ func (r *BonusCalculationImplRepository) FindByUserID(ctx context.Context, userI
 	FROM bonus_calculations b
 	JOIN orders o ON b.order_id = o.id
 	WHERE o.user_id = $1`
-	var bonusCalcs []dbModels.BonusCalculation
+	var bonusCalcs []dbmodels.BonusCalculation
 	err := r.db.SelectContext(ctx, &bonusCalcs, query, userID)
 	if err != nil {
 		return nil, errors.Wrap(ErrDatabase, "failed to find BonusCalculations by userID")
@@ -69,7 +69,7 @@ func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID s
 	return domain.CurrencyUnit(total.Int32), nil
 }
 
-func convertToDomBonusCalc(dbBCalcs []dbModels.BonusCalculation) ([]domain.BonusCalculation, error) {
+func convertToDomBonusCalc(dbBCalcs []dbmodels.BonusCalculation) ([]domain.BonusCalculation, error) {
 	domBCalcs := make([]domain.BonusCalculation, len(dbBCalcs))
 	for _, d := range dbBCalcs {
 		domBCalc, err := d.ToDomain()

@@ -6,7 +6,7 @@ import (
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
-	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbmodels"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/google/uuid"
 	"github.com/swaggest/usecase/status"
@@ -14,7 +14,7 @@ import (
 
 // DBOrderRepository определяет методы для работы с таблицей orders без domain уровня для оптимизации.
 type DBOrderRepository interface {
-	FindByUserID(ctx context.Context, userID string) ([]dbModels.OrderGetDTO, error)
+	FindByUserID(ctx context.Context, userID string) ([]dbmodels.OrderGetDTO, error)
 }
 
 type GetOrdersUseCaseImpl struct {
