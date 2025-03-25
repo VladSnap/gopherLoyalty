@@ -16,7 +16,6 @@ CREATE TABLE orders (
 CREATE TABLE bonus_calculations (
     id UUID PRIMARY KEY,
     order_id UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
-    loyalty_status TEXT NOT NULL CHECK (loyalty_status IN ('REGISTERED', 'INVALID', 'PROCESSING', 'PROCESSED')),
     accrual INTEGER NOT NULL
 );
 

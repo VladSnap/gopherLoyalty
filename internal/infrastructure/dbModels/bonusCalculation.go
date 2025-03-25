@@ -7,10 +7,9 @@ import (
 
 // Представляет таблицу расчета бонусов.
 type BonusCalculation struct {
-	ID            string `db:"id"`             // uuid
-	OrderID       string `db:"order_id"`       // -> order.ID (1 к 1)
-	LoyaltyStatus string `db:"loyalty_status"` // enum (NEW?, REGISTERED, INVALID, PROCESSING, PROCESSED)
-	Accrual       int    `db:"accrual"`        // int
+	ID      string `db:"id"`       // uuid
+	OrderID string `db:"order_id"` // -> order.ID (1 к 1)
+	Accrual int    `db:"accrual"`  // int
 }
 
 // Преобразует DBBonusCalculation в доменную модель BonusCalculation.
@@ -28,7 +27,6 @@ func (dbc *BonusCalculation) ToDomain() (*domain.BonusCalculation, error) {
 	return domain.CreateBonusCalculationFromDB(
 		id,
 		orderID,
-		dbc.LoyaltyStatus,
 		dbc.Accrual,
 	)
 }
@@ -36,9 +34,8 @@ func (dbc *BonusCalculation) ToDomain() (*domain.BonusCalculation, error) {
 // Преобразует доменную модель BonusCalculation в DBBonusCalculation.
 func DBBonusCalculationFromDomain(bc *domain.BonusCalculation) *BonusCalculation {
 	return &BonusCalculation{
-		ID:            bc.GetID().String(),
-		OrderID:       bc.GetOrderID().String(),
-		LoyaltyStatus: bc.GetLoyaltyStatus().String(),
-		Accrual:       int(bc.GetAccrual()),
+		ID:      bc.GetID().String(),
+		OrderID: bc.GetOrderID().String(),
+		Accrual: int(bc.GetAccrual()),
 	}
 }

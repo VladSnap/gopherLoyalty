@@ -21,7 +21,7 @@ func NewBonusCalculationImplRepository(db *DatabaseLoyalty) *BonusCalculationImp
 
 func (r *BonusCalculationImplRepository) Create(ctx context.Context, bonusCalculation *domain.BonusCalculation) error {
 	dbBonusCalc := dbModels.DBBonusCalculationFromDomain(bonusCalculation)
-	query := `INSERT INTO bonus_calculations (id, order_id, loyalty_status, accrual) VALUES (:id, :order_id, :loyalty_status, :accrual)`
+	query := `INSERT INTO bonus_calculations (id, order_id, accrual) VALUES (:id, :order_id, :accrual)`
 	_, err := r.db.NamedExecContext(ctx, query, dbBonusCalc)
 	if err != nil {
 		return errors.Wrap(ErrDatabase, "failed to create bonus calculation")
@@ -60,7 +60,7 @@ func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID s
 	query := `SELECT SUM(b.accrual) AS total
         FROM bonus_calculations b
         JOIN orders o ON b.order_id = o.id
-        WHERE o.user_id = $1 and loyalty_status = 'PROCESSED'`
+        WHERE o.user_id = $1`
 	err := r.db.GetContext(ctx, &total, query, userID)
 	if err != nil {
 		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed calc bonusCalculation total")
