@@ -39,11 +39,11 @@ func (r *TransactionImplRepository) FindByID(ctx context.Context, id string) (*d
 	return &transaction, nil
 }
 
-func (r *TransactionImplRepository) FindByUserID(ctx context.Context, userID string) ([]dbModels.TransactionDTO, error) {
+func (r *TransactionImplRepository) FindWithdrawalByUserID(ctx context.Context, userID string) ([]dbModels.TransactionDTO, error) {
 	query := `SELECT o.number as order_number, t.amount, t.created_at
 	FROM transactions t
 	JOIN orders o ON t.order_id = o.id
-	WHERE o.user_id = $1`
+	WHERE o.user_id = $1 and t.type = 'WITHDRAW'`
 	var transactions []dbModels.TransactionDTO
 	err := r.db.SelectContext(ctx, &transactions, query, userID)
 	if err != nil {
