@@ -30,11 +30,11 @@ func (cmd *WithdrawBalanceCmdHandlerImpl) Execute(ctx context.Context, orderNumb
 	if err != nil {
 		return fmt.Errorf("failed FindOrder OrderNumber=%s: %w", orderNumber, err)
 	}
-	if order == nil {
-		return domain.ErrInvalidOrderNotFound
-	}
-	if order.GetUserID() != currentUser {
-		return domain.ErrNotAuthorizeAccessOrder
+	// Если заказ есть в системе, то проверим, чтобы он относился к текущему юзеру
+	if order != nil {
+		if order.GetUserID() != currentUser {
+			return domain.ErrNotAuthorizeAccessOrder
+		}
 	}
 
 	// Проверяем что, на балансе достаточно баллов (эту логику ниже надо убрать в доменный слой)
