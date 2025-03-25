@@ -128,7 +128,7 @@ func (s *AccrualWorkerImpl) processOrder(ctx context.Context, order *domain.Orde
 		accrual = strconv.FormatFloat(*accrualResp.orderInfo.Accrual, 'f', -1, 64)
 	}
 
-	log.Zap.Errorf("process order %s: accrualStatus=%s, accrual=%s",
+	log.Zap.Infof("process order %s: accrualStatus=%s, accrual=%s",
 		order.GetNumber(), status, accrual)
 
 	switch status {
