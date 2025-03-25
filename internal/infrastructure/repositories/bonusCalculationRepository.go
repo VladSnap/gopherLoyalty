@@ -42,7 +42,7 @@ func (r *BonusCalculationImplRepository) FindByOrderID(ctx context.Context, orde
 }
 
 func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID string) (domain.CurrencyUnit, error) {
-	var total int
+	var total sql.NullInt32
 	query := `SELECT SUM(b.accrual) AS total
         FROM bonus_calculations b
         JOIN orders o ON b.order_id = o.id
@@ -52,5 +52,5 @@ func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID s
 		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed to calc total")
 	}
 
-	return domain.CurrencyUnit(total), nil
+	return domain.CurrencyUnit(total.Int32), nil
 }
