@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrInsufficientBalance = errors.New("insufficient balance")
+	ErrInsufficientBalance     = errors.New("insufficient balance")
+	ErrOnlyOneBonusCalculation = errors.New("acceptable only one BonusCalculation for order")
 )
 
 // Представляет доменную модель счета лояльности.
@@ -41,6 +42,22 @@ func (ba *BonusAccount) GetWithdrawals() []Withdraw {
 	return ba.withdraws
 }
 
+func (ba *BonusAccount) AddBonusCalc(order *Order, accrual CurrencyUnit) (*BonusCalculation, error) {
+	bonusCalc, err := NewBonusCalculation(order, accrual)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, bc := range ba.bonusCalcs {
+		if bc.orderID == order.GetID() {
+			return nil, ErrOnlyOneBonusCalculation
+		}
+	}
+
+	ba.bonusCalcs = append(ba.bonusCalcs, *bonusCalc)
+	return bonusCalc, nil
+}
+
 func (ba *BonusAccount) AddWithdraw(orderNumber string, amount CurrencyUnit) (*Withdraw, error) {
 	withdraw, err := NewWithdraw(orderNumber, ba.userID, amount)
 	if err != nil {
@@ -65,9 +82,7 @@ func (ba *BonusAccount) AddWithdraw(orderNumber string, amount CurrencyUnit) (*W
 func (ba *BonusAccount) getBonusCalcTotal() CurrencyUnit {
 	var total CurrencyUnit
 	for _, b := range ba.bonusCalcs {
-		if b.GetLoyaltyStatus() == LoyaltyStatusProcessed {
-			total = total + b.GetAccrual()
-		}
+		total = total + b.GetAccrual()
 	}
 	return total
 }

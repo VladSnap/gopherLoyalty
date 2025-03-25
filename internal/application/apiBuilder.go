@@ -2,9 +2,11 @@ package application
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/VladSnap/gopherLoyalty/internal/application/config"
 	"github.com/VladSnap/gopherLoyalty/internal/domain/domainServices"
+	"github.com/VladSnap/gopherLoyalty/internal/features/accrual"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getBalance"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getOrders"
 	"github.com/VladSnap/gopherLoyalty/internal/features/getWithdrawals"
@@ -62,6 +64,11 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 		getBalanceUseCase,
 		withdrawBalanceUseCase,
 		getWithdrawalsUseCase)
+
+	accrualApiClient := accrual.NewAccrualSystemClient(config.AccrualSystemAddress)
+	accrualWorker := accrual.NewAccrualWorker(orderRepo, bonusRepo, bonusAccounService,
+		accrualApiClient, 1*time.Second)
+	resMng.Register(accrualWorker.Close)
 
 	return server, nil
 }

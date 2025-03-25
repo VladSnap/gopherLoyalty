@@ -45,23 +45,9 @@ func (cmd *UploadOrderCmdHandlerImpl) Execute(ctx context.Context, orderNumber s
 		return err
 	}
 
-	bonusCalc, err := domain.NewBonusCalculation(newOrder)
-	if err != nil {
-		return err
-	}
-	// temp for testing
-	bonusCalc.Accrual(domain.CurrencyUnit(10000))
-
-	// Тут нужно сохранять данные в БД с помощью транзакции
-
 	err = cmd.orderRepo.Create(ctx, newOrder)
 	if err != nil {
 		return fmt.Errorf("failed save new order in DB: %w", err)
-	}
-
-	err = cmd.bonusCalcRepo.Create(ctx, bonusCalc)
-	if err != nil {
-		return fmt.Errorf("failed save new bonus calculation in DB: %w", err)
 	}
 
 	return nil // Означает, что новый заказ загружен без ошибок

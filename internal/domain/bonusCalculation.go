@@ -18,11 +18,11 @@ type BonusCalculation struct {
 }
 
 // Создает новый расчет бонусов, если данные корректны.
-func NewBonusCalculation(order *Order) (*BonusCalculation, error) {
+func NewBonusCalculation(order *Order, accrual CurrencyUnit) (*BonusCalculation, error) {
 	return &BonusCalculation{
 		id:      GenerateUniqueID(),
 		orderID: order.GetID(),
-		accrual: CurrencyUnit(0),
+		accrual: accrual,
 	}, nil
 }
 

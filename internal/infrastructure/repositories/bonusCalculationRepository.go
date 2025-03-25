@@ -50,7 +50,7 @@ func (r *BonusCalculationImplRepository) FindByUserID(ctx context.Context, userI
 	var bonusCalcs []dbModels.BonusCalculation
 	err := r.db.SelectContext(ctx, &bonusCalcs, query, userID)
 	if err != nil {
-		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
+		return nil, errors.Wrap(ErrDatabase, "failed to find BonusCalculations by userID")
 	}
 	return convertToDomBonusCalc(bonusCalcs)
 }

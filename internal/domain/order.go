@@ -16,6 +16,8 @@ var (
 	ErrInvalidStatus               = errors.New("status is required")
 	ErrAlreadyUploadedOrderCurrent = errors.New("order already uploaded by current user")
 	ErrAlreadyUploadedOrderAnother = errors.New("order already uploaded by another user")
+	ErrInvalidBonusCalc            = errors.New("bonus calculation id does not match the order")
+	ErrOrderChangeStatus           = errors.New("the current order status is not correct for changing it")
 )
 
 // Order представляет доменную модель заказа.
@@ -90,32 +92,33 @@ func (o *Order) GetStatus() OrderStatus {
 	return o.status
 }
 
-// Setters
-func (o *Order) SetNumber(number string) error {
-	if number == "" {
-		return ErrInvalidOrderNumber
+func (o *Order) MarkProcessed(bonCalc BonusCalculation) error {
+	if o.status != OrderStatusNew && o.status != OrderStatusProcessing {
+		return ErrOrderChangeStatus
 	}
-	o.number = number
+
+	if bonCalc.orderID != o.id {
+		return ErrInvalidBonusCalc
+	}
+
+	o.status = OrderStatusProcessed
 	return nil
 }
 
-func (o *Order) SetUploadedAt(uploadedAt time.Time) {
-	o.uploadedAt = uploadedAt
-}
-
-func (o *Order) SetUserID(userID uuid.UUID) error {
-	if userID == uuid.Nil {
-		return ErrInvalidUserID
+func (o *Order) MarkProcessing() error {
+	if o.status != OrderStatusNew {
+		return ErrOrderChangeStatus
 	}
-	o.userID = userID
+
+	o.status = OrderStatusProcessing
 	return nil
 }
 
-func (o *Order) SetBonusCalculationID(bonusCalculationID *uuid.UUID) {
-	o.bonusCalculationID = bonusCalculationID
-}
+func (o *Order) MarkInvalid() error {
+	if o.status != OrderStatusNew && o.status != OrderStatusProcessing {
+		return ErrOrderChangeStatus
+	}
 
-func (o *Order) SetStatus(status OrderStatus) error {
-	o.status = status
+	o.status = OrderStatusInvalid
 	return nil
 }

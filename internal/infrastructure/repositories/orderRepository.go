@@ -55,6 +55,16 @@ func (r *OrderImplRepository) FindByNumber(ctx context.Context, number string) (
 	return order.ToDomain()
 }
 
+func (r *OrderImplRepository) FindNotProcessed(ctx context.Context) ([]domain.Order, error) {
+	query := `SELECT * FROM orders WHERE status IN ('NEW', 'PROCESSING')`
+	var orders []dbModels.Order
+	err := r.db.SelectContext(ctx, &orders, query)
+	if err != nil {
+		return nil, errors.Wrap(ErrDatabase, "failed to find Orders by status")
+	}
+	return convertOrders(orders)
+}
+
 func (r *OrderImplRepository) Update(ctx context.Context, order *domain.Order) error {
 	query := `UPDATE orders SET number = :number, uploaded_at = :uploaded_at, user_id = :user_id, status = :status WHERE id = :id`
 	dbOrder := dbModels.DBOrderFromDomain(order)
