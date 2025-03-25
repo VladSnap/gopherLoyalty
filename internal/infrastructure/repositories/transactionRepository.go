@@ -20,7 +20,7 @@ func NewTransactionImplRepository(db *DatabaseLoyalty) *TransactionImplRepositor
 
 func (r *TransactionImplRepository) Create(ctx context.Context, transaction *domain.Transaction) error {
 	dbTran := dbModels.DBTransactionFromDomain(transaction)
-	query := `INSERT INTO transactions (id, created_at, type, order_id) VALUES (:id, :created_at, :type, :order_id)`
+	query := `INSERT INTO transactions (id, created_at, type, order_id, amount) VALUES (:id, :created_at, :type, :order_id, :amount)`
 	_, err := r.db.NamedExecContext(ctx, query, dbTran)
 	if err != nil {
 		return errors.Wrap(ErrDatabase, "failed to create loyalty account transaction")
