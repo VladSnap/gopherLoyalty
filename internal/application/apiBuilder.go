@@ -41,7 +41,7 @@ func CreateApiServer(config *config.AppConfig, resMng *services.ResourceManager)
 	loginCmd := loginUser.NewRegistrationUserCmdHandler(userRepo, passService)
 	loginUseCase := loginUser.NewLoginUserUseCase(loginCmd, jwtService)
 
-	uploadOrderCmd := uploadOrder.NewUploadOrderCmdHandler(userRepo, orderRepo)
+	uploadOrderCmd := uploadOrder.NewUploadOrderCmdHandler(userRepo, orderRepo, bonusRepo)
 	uploadOrderUseCase := uploadOrder.NewUploadOrderUseCase(uploadOrderCmd)
 
 	getOrdersUseCase := getOrders.NewGetOrdersUseCase(orderRepo)

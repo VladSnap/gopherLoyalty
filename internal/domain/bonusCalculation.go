@@ -21,7 +21,7 @@ type BonusCalculation struct {
 }
 
 // Создает новый расчет бонусов, если данные корректны.
-func NewBonusCalculation(order Order) (*BonusCalculation, error) {
+func NewBonusCalculation(order *Order) (*BonusCalculation, error) {
 	return &BonusCalculation{
 		id:            GenerateUniqueID(),
 		orderID:       order.GetID(),
@@ -60,4 +60,11 @@ func (bc *BonusCalculation) GetLoyaltyStatus() LoyaltyStatus {
 
 func (bc *BonusCalculation) GetAccrual() CurrencyUnit {
 	return bc.accrual
+}
+
+// temp for testing
+
+func (bc *BonusCalculation) Accrual(accrual CurrencyUnit) {
+	bc.accrual = accrual
+	bc.loyaltyStatus = LoyaltyStatusProcessed
 }

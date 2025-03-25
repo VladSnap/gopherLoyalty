@@ -22,7 +22,7 @@ func NewUploadOrderUseCase(cmdHandler UploadOrderCmdHandler) *UploadOrderUseCase
 }
 
 type UploadOrderCmdHandler interface {
-	Execute(ctx context.Context, orderNumber string, currentUser uuid.UUID) (bool, error)
+	Execute(ctx context.Context, orderNumber string, currentUser uuid.UUID) error
 }
 
 func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrderRequest, output *api.HttpStatusResponse) error {
@@ -33,7 +33,7 @@ func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrder
 		return status.Wrap(err, status.Unknown)
 	}
 
-	_, err := uc.cmdHandler.Execute(ctx, input.TextBody, currentUserID)
+	err := uc.cmdHandler.Execute(ctx, input.TextBody, currentUserID)
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrInvalidOrderNumber):
