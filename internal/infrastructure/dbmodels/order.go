@@ -14,7 +14,6 @@ type Order struct {
 	Number             string    `db:"number"`                         // string
 	UploadedAt         time.Time `db:"uploaded_at"`                    // datetime
 	UserID             string    `db:"user_id"`                        // -> user.ID (многие к 1)
-	BonusCalculationID *string   `db:"bonus_calculation_id,omitempty"` // -> bonusCalculation.ID (1 к 1)
 	Status             string    `db:"status"`                         // enum (NEW, INVALID, PROCESSING, PROCESSED)
 }
 
@@ -38,39 +37,22 @@ func (dbo *Order) ToDomain() (*domain.Order, error) {
 		return nil, fmt.Errorf("failed ParseUniqueID for UserID: %w", err)
 	}
 
-	var bonusCalculationID *uuid.UUID
-	if dbo.BonusCalculationID != nil {
-		parsedUUID, err := uuid.Parse(*dbo.BonusCalculationID)
-		if err != nil {
-			return nil, err
-		}
-		bonusCalculationID = &parsedUUID
-	}
-
 	return domain.CreateOrderFromDB(
 		id,
 		dbo.Number,
 		dbo.UploadedAt,
 		userID,
 		dbo.Status,
-		bonusCalculationID,
 	)
 }
 
 // Преобразует доменную модель Order в DBOrder.
 func DBOrderFromDomain(order *domain.Order) *Order {
-	var bonusCalculationID *string
-	if order.GetBonusCalculationID() != nil {
-		strUUID := order.GetBonusCalculationID().String()
-		bonusCalculationID = &strUUID
-	}
-
 	return &Order{
 		ID:                 order.GetID().String(),
 		Number:             order.GetNumber(),
 		UploadedAt:         order.GetUploadedAt(),
 		UserID:             order.GetUserID().String(),
-		BonusCalculationID: bonusCalculationID,
 		Status:             order.GetStatus().String(),
 	}
 }

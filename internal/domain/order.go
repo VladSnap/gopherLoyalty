@@ -22,12 +22,11 @@ var (
 
 // Order представляет доменную модель заказа.
 type Order struct {
-	id                 uuid.UUID
-	number             string
-	uploadedAt         time.Time
-	userID             uuid.UUID
-	bonusCalculationID *uuid.UUID // Опциональное поле
-	status             OrderStatus
+	id         uuid.UUID
+	number     string
+	uploadedAt time.Time
+	userID     uuid.UUID
+	status     OrderStatus
 }
 
 // NewOrder создает новый заказ, если данные корректны.
@@ -41,29 +40,27 @@ func NewOrder(number string, uploadedAt time.Time,
 	}
 
 	return &Order{
-		id:                 GenerateUniqueID(),
-		number:             number,
-		uploadedAt:         uploadedAt,
-		userID:             userID,
-		bonusCalculationID: nil,
-		status:             OrderStatusNew,
+		id:         GenerateUniqueID(),
+		number:     number,
+		uploadedAt: uploadedAt,
+		userID:     userID,
+		status:     OrderStatusNew,
 	}, nil
 }
 
 // CreateOrderFromDB создает заказ из БД, игнорирует валидацию.
 func CreateOrderFromDB(id uuid.UUID, number string, uploadedAt time.Time,
-	userID uuid.UUID, status string, bonusCalculationID *uuid.UUID) (*Order, error) {
+	userID uuid.UUID, status string) (*Order, error) {
 	oStatus, err := ParseOrderStatus(status)
 	if err != nil {
 		return nil, fmt.Errorf("failed ParseOrderStatus: %w", err)
 	}
 	return &Order{
-		id:                 id,
-		number:             number,
-		uploadedAt:         uploadedAt,
-		userID:             userID,
-		bonusCalculationID: bonusCalculationID,
-		status:             oStatus,
+		id:         id,
+		number:     number,
+		uploadedAt: uploadedAt,
+		userID:     userID,
+		status:     oStatus,
 	}, nil
 }
 
@@ -82,10 +79,6 @@ func (o *Order) GetUploadedAt() time.Time {
 
 func (o *Order) GetUserID() uuid.UUID {
 	return o.userID
-}
-
-func (o *Order) GetBonusCalculationID() *uuid.UUID {
-	return o.bonusCalculationID
 }
 
 func (o *Order) GetStatus() OrderStatus {

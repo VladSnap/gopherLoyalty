@@ -9,7 +9,6 @@ CREATE TABLE orders (
     number TEXT NOT NULL UNIQUE,
     uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    bonus_calculation_id UUID UNIQUE,
     status TEXT NOT NULL CHECK (status IN ('NEW', 'INVALID', 'PROCESSING', 'PROCESSED'))
 );
 
