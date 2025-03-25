@@ -1,4 +1,4 @@
-package dbModels
+package dbmodels
 
 import (
 	"github.com/VladSnap/gopherLoyalty/internal/domain"

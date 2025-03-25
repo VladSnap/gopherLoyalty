@@ -41,7 +41,7 @@ func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrder
 			return rest.HTTPCodeAsError(http.StatusUnprocessableEntity)
 		case errors.Is(err, domain.ErrAlreadyUploadedOrderCurrent):
 			log.Zap.Error(err)
-			output.WithHttpStatus(http.StatusOK)
+			output.WithHTTPStatus(http.StatusOK)
 			return nil
 		case errors.Is(err, domain.ErrAlreadyUploadedOrderAnother):
 			log.Zap.Error(err)
@@ -51,6 +51,6 @@ func (uc *UploadOrderUseCaseImpl) Execute(ctx context.Context, input UploadOrder
 			return status.Wrap(errors.New("unknown error"), status.Unknown)
 		}
 	}
-	output.WithHttpStatus(http.StatusAccepted)
+	output.WithHTTPStatus(http.StatusAccepted)
 	return nil
 }

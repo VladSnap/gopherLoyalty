@@ -74,7 +74,7 @@ func (s *AccrualWorkerImpl) processOrders(ctx context.Context) {
 	}
 
 	for _, order := range orders {
-		accrualResp, err := s.getOrderInfoAccrual(ctx, order.GetNumber())
+		accrualResp, err := s.getOrderInfoAccrual(order.GetNumber())
 		if err != nil {
 			log.Zap.Errorf("failed getOrderInfoAccrual for order %s: %v", order.GetNumber(), err)
 			continue
@@ -93,7 +93,7 @@ func (s *AccrualWorkerImpl) processOrders(ctx context.Context) {
 	}
 }
 
-func (s *AccrualWorkerImpl) getOrderInfoAccrual(ctx context.Context, orderNumber string) (*AccrualResult, error) {
+func (s *AccrualWorkerImpl) getOrderInfoAccrual(orderNumber string) (*AccrualResult, error) {
 	const retryLimit int = 10
 	retryAttempts := 0
 	for {
@@ -137,9 +137,9 @@ func (s *AccrualWorkerImpl) processOrder(ctx context.Context, order *domain.Orde
 	case domain.LoyaltyStatusRegistered:
 		err = s.handleRegisteredStatus(ctx, order)
 	case domain.LoyaltyStatusProcessing:
-		err = s.handleProcessingStatus(ctx, order, accrualResp)
+		err = s.handleProcessingStatus(ctx, order)
 	case domain.LoyaltyStatusInvalid:
-		err = s.handleInvalidStatus(ctx, order, accrualResp)
+		err = s.handleInvalidStatus(ctx, order)
 	case domain.LoyaltyStatusProcessed:
 		err = s.handleProcessedStatus(ctx, order, accrualResp)
 	}
@@ -165,8 +165,7 @@ func (s *AccrualWorkerImpl) handleRegisteredStatus(ctx context.Context, order *d
 	return nil
 }
 
-func (s *AccrualWorkerImpl) handleProcessingStatus(ctx context.Context, order *domain.Order,
-	accrualResp *AccrualResult) error {
+func (s *AccrualWorkerImpl) handleProcessingStatus(ctx context.Context, order *domain.Order) error {
 	if order.GetStatus() == domain.OrderStatusProcessing {
 		log.Zap.Infof("order %s still being processed", order.GetNumber())
 		return nil
@@ -185,8 +184,7 @@ func (s *AccrualWorkerImpl) handleProcessingStatus(ctx context.Context, order *d
 	return nil
 }
 
-func (s *AccrualWorkerImpl) handleInvalidStatus(ctx context.Context, order *domain.Order,
-	accrualResp *AccrualResult) error {
+func (s *AccrualWorkerImpl) handleInvalidStatus(ctx context.Context, order *domain.Order) error {
 	err := order.MarkInvalid()
 	if err != nil {
 		return fmt.Errorf("failed order update status: %w", err)
