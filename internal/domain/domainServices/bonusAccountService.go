@@ -18,8 +18,23 @@ func NewBonusAccountServiceImpl(withdrawRepo domain.WithdrawRepository,
 	return &BonusAccountServiceImpl{withdrawRepo: withdrawRepo, bonusCalcRepo: bonusCalcRepo}
 }
 
-func (bs *BonusAccountServiceImpl) GetBonusAccount(userID uuid.UUID) {
+func (bs *BonusAccountServiceImpl) GetBonusAccount(ctx context.Context, userID uuid.UUID) (*domain.BonusAccount, error) {
+	bonusCalcs, err := bs.bonusCalcRepo.FindByUserID(ctx, userID.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed bonusCalcRepo.FindByUserID: %w", err)
+	}
 
+	withdraws, err := bs.withdrawRepo.FindByUserID(ctx, userID.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed withdrawRepo.FindByUserID: %w", err)
+	}
+
+	account, err := domain.NewBonusAccount(userID, bonusCalcs, withdraws)
+	if err != nil {
+		return nil, fmt.Errorf("failed NewBonusAccount: %w", err)
+	}
+
+	return account, nil
 }
 
 func (bs *BonusAccountServiceImpl) GetBonusAccountState(ctx context.Context, userID uuid.UUID) (*domain.BonusAccountState, error) {

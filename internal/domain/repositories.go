@@ -24,6 +24,7 @@ type OrderRepository interface {
 type BonusCalculationRepository interface {
 	Create(ctx context.Context, bonusCalculation *BonusCalculation) error
 	FindByOrderID(ctx context.Context, orderID string) (*BonusCalculation, error)
+	FindByUserID(ctx context.Context, userID string) ([]BonusCalculation, error)
 	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }
 
@@ -31,5 +32,6 @@ type BonusCalculationRepository interface {
 type WithdrawRepository interface {
 	Create(ctx context.Context, withdraw *Withdraw) error
 	FindByID(ctx context.Context, id string) (*Withdraw, error)
+	FindByUserID(ctx context.Context, userID string) ([]Withdraw, error)
 	CalcTotal(ctx context.Context, userID string) (CurrencyUnit, error)
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
@@ -41,16 +42,24 @@ func (r *WithdrawImplRepository) FindByID(ctx context.Context, id string) (*doma
 	return Withdraw.ToDomain()
 }
 
-func (r *WithdrawImplRepository) FindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error) {
-	query := `SELECT w.order_number, w.amount, w.created_at
-	FROM withdraws w
-	WHERE o.user_id = $1`
+func (r *WithdrawImplRepository) DBFindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error) {
+	query := `SELECT * FROM withdraws WHERE user_id = $1`
 	var withdraws []dbModels.Withdraw
 	err := r.db.SelectContext(ctx, &withdraws, query, userID)
 	if err != nil {
-		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by order userID")
+		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
 	}
 	return withdraws, nil
+}
+
+func (r *WithdrawImplRepository) FindByUserID(ctx context.Context, userID string) ([]domain.Withdraw, error) {
+	query := `SELECT * FROM withdraws WHERE user_id = $1`
+	var withdraws []dbModels.Withdraw
+	err := r.db.SelectContext(ctx, &withdraws, query, userID)
+	if err != nil {
+		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
+	}
+	return convertToDomWithdraw(withdraws)
 }
 
 func (r *WithdrawImplRepository) CalcTotal(ctx context.Context, userID string) (domain.CurrencyUnit, error) {
@@ -60,7 +69,21 @@ func (r *WithdrawImplRepository) CalcTotal(ctx context.Context, userID string) (
         WHERE user_id = $1`
 	err := r.db.GetContext(ctx, &total, query, userID)
 	if err != nil {
-		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed to calc total")
+		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed calc withdraw total")
 	}
 	return domain.CurrencyUnit(total.Int32), nil
+}
+
+func convertToDomWithdraw(dbWs []dbModels.Withdraw) ([]domain.Withdraw, error) {
+	domWs := make([]domain.Withdraw, len(dbWs))
+	for _, d := range dbWs {
+		domW, err := d.ToDomain()
+		if err != nil {
+			return nil, fmt.Errorf("fail convertToDomWithdraw: %w", err)
+		}
+
+		domWs = append(domWs, *domW)
+	}
+
+	return domWs, nil
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
@@ -41,6 +42,19 @@ func (r *BonusCalculationImplRepository) FindByOrderID(ctx context.Context, orde
 	return bonusCalculation.ToDomain()
 }
 
+func (r *BonusCalculationImplRepository) FindByUserID(ctx context.Context, userID string) ([]domain.BonusCalculation, error) {
+	query := `SELECT b.*
+	FROM bonus_calculations b
+	JOIN orders o ON b.order_id = o.id
+	WHERE o.user_id = $1`
+	var bonusCalcs []dbModels.BonusCalculation
+	err := r.db.SelectContext(ctx, &bonusCalcs, query, userID)
+	if err != nil {
+		return nil, errors.Wrap(ErrDatabase, "failed to find withdraws by userID")
+	}
+	return convertToDomBonusCalc(bonusCalcs)
+}
+
 func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID string) (domain.CurrencyUnit, error) {
 	var total sql.NullInt32
 	query := `SELECT SUM(b.accrual) AS total
@@ -49,8 +63,22 @@ func (r *BonusCalculationImplRepository) CalcTotal(ctx context.Context, userID s
         WHERE o.user_id = $1 and loyalty_status = 'PROCESSED'`
 	err := r.db.GetContext(ctx, &total, query, userID)
 	if err != nil {
-		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed to calc total")
+		return domain.CurrencyUnit(0), errors.Wrap(ErrDatabase, "failed calc bonusCalculation total")
 	}
 
 	return domain.CurrencyUnit(total.Int32), nil
+}
+
+func convertToDomBonusCalc(dbBCalcs []dbModels.BonusCalculation) ([]domain.BonusCalculation, error) {
+	domBCalcs := make([]domain.BonusCalculation, len(dbBCalcs))
+	for _, d := range dbBCalcs {
+		domBCalc, err := d.ToDomain()
+		if err != nil {
+			return nil, fmt.Errorf("fail convertToDomBonusCalc: %w", err)
+		}
+
+		domBCalcs = append(domBCalcs, *domBCalc)
+	}
+
+	return domBCalcs, nil
 }

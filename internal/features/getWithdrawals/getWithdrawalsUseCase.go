@@ -13,7 +13,7 @@ import (
 )
 
 type DBWithdrawRepository interface {
-	FindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error)
+	DBFindByUserID(ctx context.Context, userID string) ([]dbModels.Withdraw, error)
 }
 
 type GetWithdrawalsUseCaseImpl struct {
@@ -30,7 +30,7 @@ func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interfa
 		return status.Wrap(errors.New("current userID is empty"), status.Unknown)
 	}
 
-	withdrawals, err := uc.withdrawRepo.FindByUserID(ctx, currentUserID.String())
+	withdrawals, err := uc.withdrawRepo.DBFindByUserID(ctx, currentUserID.String())
 	if err != nil {
 		log.Zap.Errorf("failed FindByUserID", err)
 		return status.Wrap(err, status.Unknown)
