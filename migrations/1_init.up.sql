@@ -1,0 +1,27 @@
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    login TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE orders (
+    id UUID PRIMARY KEY,
+    number TEXT NOT NULL UNIQUE,
+    uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL CHECK (status IN ('NEW', 'INVALID', 'PROCESSING', 'PROCESSED'))
+);
+
+CREATE TABLE bonus_calculations (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+    accrual INTEGER NOT NULL
+);
+
+CREATE TABLE withdraws (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    order_number TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount INTEGER NOT NULL
+);
