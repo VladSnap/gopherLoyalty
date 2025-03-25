@@ -7,6 +7,7 @@ import (
 	"github.com/VladSnap/gopherLoyalty/internal/domain"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/api"
 	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/dbModels"
+	"github.com/VladSnap/gopherLoyalty/internal/infrastructure/log"
 	"github.com/google/uuid"
 	"github.com/swaggest/usecase/status"
 )
@@ -31,6 +32,7 @@ func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interfa
 
 	trans, err := uc.transactRepo.FindWithdrawalByUserID(ctx, currentUserID.String())
 	if err != nil {
+		log.Zap.Errorf("failed FindWithdrawalByUserID", err)
 		return status.Wrap(err, status.Unknown)
 	}
 
