@@ -65,7 +65,7 @@ func NewAPIServer(config *config.AppConfig,
 	return server
 }
 
-func (server *SwaggestAPIServer) Start() error {
+func (sr *SwaggestAPIServer) Start() error {
 	reflector := openapi31.NewReflector()
 	service := web.NewService(reflector)
 
@@ -81,13 +81,13 @@ func (server *SwaggestAPIServer) Start() error {
 		middleware.Recoverer,
 	)
 
-	err := server.registerRoutes(service)
+	err := sr.registerRoutes(service)
 	if err != nil {
 		return fmt.Errorf("failed registerRoutes: %w", err)
 	}
 
 	serv := &http.Server{
-		Addr:    server.config.RunAddress,
+		Addr:    sr.config.RunAddress,
 		Handler: service,
 	}
 
