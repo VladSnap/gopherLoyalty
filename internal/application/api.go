@@ -125,14 +125,14 @@ func (sr *SwaggestAPIServer) registerRoutes(sv *web.Service) error {
 		sv.OpenAPICollector, "UserAuthToken", "Authorization", oapi.InHeader, "Authorization token.",
 	)
 
-	// Роуты без аутентификации
-	regRoute(sv.Router, sr.registerUseCase.Execute, http.MethodPost, "/api/user/register", http.StatusOK,
-		"Регистрация пользователя.", "Регистрация нового пользователя.", "Not Auth")
-	regRoute(sv.Router, sr.loginUseCase.Execute, http.MethodPost, "/api/user/login", http.StatusOK,
-		"Аутентификация пользователя.", "Вход пользователя в систему.", "Not Auth")
-
-	// Роуты с аутентификацией
 	sv.Route("/api/user", func(r chi.Router) {
+		// Роуты без аутентификации
+		regRoute(r, sr.registerUseCase.Execute, http.MethodPost, "/register", http.StatusOK,
+			"Регистрация пользователя.", "Регистрация нового пользователя.", "Not Auth")
+		regRoute(r, sr.loginUseCase.Execute, http.MethodPost, "/login", http.StatusOK,
+			"Аутентификация пользователя.", "Вход пользователя в систему.", "Not Auth")
+
+		// Роуты с аутентификацией
 		r.Group(func(rg chi.Router) {
 			rg.Use(authMiddleware, apiDocAuthDoc) // Применяем middleware для аутентификации
 
