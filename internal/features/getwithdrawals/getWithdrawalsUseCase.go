@@ -32,7 +32,7 @@ func (uc *GetWithdrawalsUseCaseImpl) Execute(ctx context.Context, input *interfa
 
 	withdrawals, err := uc.withdrawRepo.DBFindByUserID(ctx, currentUserID.String())
 	if err != nil {
-		log.Zap.Errorf("failed FindByUserID", err)
+		log.Zap.Errorf("failed FindByUserID: %v", err)
 		return status.Wrap(err, status.Unknown)
 	}
 
