@@ -21,7 +21,6 @@ import (
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui"
 	swguiv5 "github.com/swaggest/swgui/v5emb"
-	"github.com/swaggest/usecase"
 )
 
 type APIServer interface {
@@ -119,58 +118,34 @@ func (server *SwaggestAPIServer) Start() error {
 	return nil
 }
 
-func (server *SwaggestAPIServer) registerRoutes(service *web.Service) error {
-	// Подготовка и настройка Interactor для корректной работы swagger
-	registerInter := usecase.NewInteractor(server.registerUseCase.Execute)
-	registerInter.SetTitle("Регистрация пользователя.")
-	registerInter.SetName("registerUseCase")
-	registerInter.SetTags("Not Auth")
+func (sr *SwaggestAPIServer) registerRoutes(sv *web.Service) error {
+	// Middleware для аутентификации
+	authMiddleware := middlewares.NewAuthMiddleware(sr.jwtService)
+	apiDocAuthDoc := nethttp.APIKeySecurityMiddleware(
+		sv.OpenAPICollector, "UserAuthToken", "Authorization", oapi.InHeader, "Authorization token.",
+	)
 
-	loginInter := usecase.NewInteractor(server.loginUseCase.Execute)
-	loginInter.SetTitle("Аутентификация пользователя.")
-	loginInter.SetName("loginUseCase")
-	loginInter.SetTags("Not Auth")
+	// Роуты без аутентификации
+	regRoute(sv.Router, sr.registerUseCase.Execute, http.MethodPost, "/api/user/register", http.StatusOK,
+		"Регистрация пользователя.", "Регистрация нового пользователя.", "Not Auth")
+	regRoute(sv.Router, sr.loginUseCase.Execute, http.MethodPost, "/api/user/login", http.StatusOK,
+		"Аутентификация пользователя.", "Вход пользователя в систему.", "Not Auth")
 
-	uploadOrderInter := usecase.NewInteractor(server.uploadOrderUseCase.Execute)
-	uploadOrderInter.SetTitle("Загрузка номера заказа. Требуется аутентификация.")
-	uploadOrderInter.SetName("uploadOrderUseCase")
-	uploadOrderInter.SetTags("Required Auth")
-
-	getOrdersInter := usecase.NewInteractor(server.getOrdersUseCase.Execute)
-	getOrdersInter.SetTitle("Получение списка загруженных номеров заказов. Требуется аутентификация и авторизация.")
-	getOrdersInter.SetName("getOrdersUseCase")
-	getOrdersInter.SetTags("Required Auth")
-
-	getBalanceInter := usecase.NewInteractor(server.getBalanceUseCase.Execute)
-	getBalanceInter.SetTitle("Получение текущего баланса счёта баллов лояльности пользователя. Требуется аутентификация и авторизация.")
-	getBalanceInter.SetName("getBalanceUseCase")
-	getBalanceInter.SetTags("Required Auth")
-
-	wthdrawBalanceInter := usecase.NewInteractor(server.wthdrawBalanceUseCase.Execute)
-	wthdrawBalanceInter.SetTitle("Запрос на списание баллов с накопительного счёта в счёт оплаты нового заказа. Требуется аутентификация и авторизация.")
-	wthdrawBalanceInter.SetName("wthdrawBalanceUseCase")
-	wthdrawBalanceInter.SetTags("Required Auth")
-
-	getWithdrawalsInter := usecase.NewInteractor(server.getWithdrawalsUseCase.Execute)
-	getWithdrawalsInter.SetTitle("Получение информации о выводе средств с накопительного счёта пользователем. Требуется аутентификация и авторизация.")
-	getWithdrawalsInter.SetName("getWithdrawalsUseCase")
-	getWithdrawalsInter.SetTags("Required Auth")
-
-	apiDocAuthDoc := nethttp.APIKeySecurityMiddleware(service.OpenAPICollector, "UserAuthToken",
-		"Authorization", oapi.InHeader, "Authorization token.")
-
-	service.Post("/api/user/register", registerInter, nethttp.SuccessStatus(http.StatusOK))
-	service.Post("/api/user/login", loginInter, nethttp.SuccessStatus(http.StatusOK))
-
-	// Регистрация защищенных аутентификацией и авторизацией маршрутов
-	service.Route("/api/user", func(r chi.Router) {
+	// Роуты с аутентификацией
+	sv.Route("/api/user", func(r chi.Router) {
 		r.Group(func(rg chi.Router) {
-			rg.Use(middlewares.NewAuthMiddleware(server.jwtService), apiDocAuthDoc)
-			rg.Method(http.MethodPost, "/orders", nethttp.NewHandler(uploadOrderInter))
-			rg.Method(http.MethodGet, "/orders", nethttp.NewHandler(getOrdersInter))
-			rg.Method(http.MethodGet, "/balance", nethttp.NewHandler(getBalanceInter))
-			rg.Method(http.MethodPost, "/balance/withdraw", nethttp.NewHandler(wthdrawBalanceInter, nethttp.SuccessStatus(http.StatusOK)))
-			rg.Method(http.MethodGet, "/withdrawals", nethttp.NewHandler(getWithdrawalsInter))
+			rg.Use(authMiddleware, apiDocAuthDoc) // Применяем middleware для аутентификации
+
+			regRoute(rg, sr.uploadOrderUseCase.Execute, http.MethodPost, "/orders", 0,
+				"Загрузка номера заказа.", "Требуется аутентификация.", "Required Auth")
+			regRoute(rg, sr.getOrdersUseCase.Execute, http.MethodGet, "/orders", 0,
+				"Получение списка загруженных номеров заказов.", "Требуется аутентификация.", "Required Auth")
+			regRoute(rg, sr.getBalanceUseCase.Execute, http.MethodGet, "/balance", 0,
+				"Получение текущего баланса.", "Требуется аутентификация.", "Required Auth")
+			regRoute(rg, sr.wthdrawBalanceUseCase.Execute, http.MethodPost, "/balance/withdraw", http.StatusOK,
+				"Запрос на списание баллов.", "Требуется аутентификация.", "Required Auth")
+			regRoute(rg, sr.getWithdrawalsUseCase.Execute, http.MethodGet, "/withdrawals", 0,
+				"Получение информации о выводе средств.", "Требуется аутентификация.", "Required Auth")
 		})
 	})
 

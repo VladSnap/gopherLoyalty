@@ -41,7 +41,7 @@ func (ba *BonusAccountState) GetBalance() CurrencyUnit {
 	return ba.balance
 }
 
-func (ba *BonusAccountState) GetИonusCalcTotal() CurrencyUnit {
+func (ba *BonusAccountState) GetBonusCalcTotal() CurrencyUnit {
 	return ba.bonusCalcTotal
 }
 
